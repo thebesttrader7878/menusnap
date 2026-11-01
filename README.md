@@ -12,4 +12,4 @@ Test locally: `node test/fake-ai.js` then `XAI_API_KEY=x AI_BASE_URL=http://loca
 
 ## Live hosting (no custom domain yet)
 Restaurant sites are served at `BASE_URL/r/<slug>/` (the platform proxies and rewrites the template's absolute paths, scopes cookies and cart storage per restaurant). Set `SITES_DOMAIN` once a wildcard domain points at the service to switch to `<slug>.SITES_DOMAIN`.
-With no `GMAIL_APP_PASSWORD`, every email is queued in `DATA_DIR/outbox` and marked "queued" in /admin; use "Rebuild + resend links" / "Resend to bot" once the password is set.
+The platform sends one email only: new submission -> BOT_INBOX_EMAIL via Resend (`RESEND_API_KEY`). Without the key it is queued in `DATA_DIR/outbox`; use "Resend to bot" in /admin once set. Owners are emailed by the MenuSnap bot (see BOT.md); set `OWNER_EMAILS=1` only to make the platform do it.

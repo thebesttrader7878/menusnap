@@ -1,37 +1,43 @@
-# MenuSnap bot runbook (email-triggered)
+# MenuSnap bot runbook
 
-When a restaurant submits the form at `/start`, the platform emails your inbox (`BOT_INBOX_EMAIL`) from sevenwilson89@gmail.com:
-- **Subject:** `New MenuSnap submission: <Restaurant name> [<id>]`
-- **Body:** submission ID, restaurant name, email, phone, address, hours, brand colors.
-- **Attachments:** `menu-1.jpg`, `menu-2.jpg`, … and `logo.png` (if they sent one).
+The platform (https://menusnap-lj8z.onrender.com) never emails restaurant owners. **You (the MenuSnap bot) do**, from your own inbox menusnap@mail.grokbot.com.
+`bot.js` reads `MENUSNAP_URL` and `BOT_API_TOKEN` from `.env.bot` next to it (never paste the token anywhere).
 
-No AI key is used. The submission waits in status `pending_bot` until you post the menu.
+## Flow for each submission
+1. **Email arrives** at menusnap@mail.grokbot.com, subject `New MenuSnap submission: <name> [<id>]`, with the menu photo(s) + logo attached (and bot API download links).
+   No email? Run `node bot.js pending` (lists `pending_bot` / `needs_review`). The platform can only email you once Seven sets `RESEND_API_KEY`.
+2. **Check status first.** `node bot.js fetch <id>` saves photos + `info.json` to `/workspace/menusnap-inbox/<id>/`.
+   If `info.json` status is `live`, it is already done: do NOT rebuild (build refuses with 409; `--force` would invalidate the owner's dashboard link).
+3. **Read the photos** and write `/workspace/menusnap-inbox/<id>/menu.json`:
+   `{"categories":[{"name":"Tacos","items":[{"name":"Al Pastor","description":"...","price":3.5}]}]}` (price a number in dollars; skip items with no readable price, or ask Seven).
+4. **Submit:** `node bot.js submit <id> /workspace/menusnap-inbox/<id>/menu.json` (validation errors list the bad fields; fix and resubmit).
+5. **Build + publish live:** `node bot.js build <id>` prints JSON:
+   `{ "ok": true, "status": "live", "siteUrl": ".../r/<slug>", "dashboardUrl": ".../r/<slug>/owner#key=...", "owner": { "name", "email", "phone" } }`
+   The dashboardUrl is a private login link: send it only to the owner's email. Each build makes a new one.
+6. **Email the owner** from menusnap@mail.grokbot.com to `owner.email` using the template below.
+7. **Report to Seven:** restaurant, siteUrl, owner email, sent yes/no. Never include the dashboardUrl or token in the report.
 
-Setup (once): `cd /workspace/webdev/menu2site`. Set `BOT_API_TOKEN` (same value as on the server) and `MENUSNAP_URL` (e.g. `https://menusnap.onrender.com`; default `http://localhost:3000`).
+## Owner email template
+Subject: Your free online ordering site is ready, <Restaurant>
 
-## For each submission email
-1. **Read the email.** Note the `[id]` in the subject.
-2. **View every attached menu photo** with your image reader. Save the attachments to `/workspace/menusnap-inbox/<id>/` first if needed. Zoom on crops if text is small.
-   Backup: `node bot.js fetch <id>` downloads the photos and `info.json` there.
-3. **Write `/workspace/menusnap-inbox/<id>/menu.json`:**
-   ```json
-   {"categories":[
-     {"name":"Tacos","items":[
-       {"name":"Al Pastor Taco","description":"Marinated pork, pineapple, cilantro","price":3.50},
-       {"name":"Horchata","description":"","price":3.00}
-     ]}
-   ]}
-   ```
-   Rules:
-   - Keep the menu's category names and order. Each category needs at least 1 item.
-   - `price` is a number in dollars (no `$`, not a string).
-   - Several sizes: use the lowest price and put the sizes in the description, e.g. "Small $8 / Large $12".
-   - Use `"description": ""` when the menu doesn't have one.
-   - Never invent items or prices. If a price is unreadable or "market price", leave the item out and say so in your report.
-4. **Submit:** `node bot.js submit <id> /workspace/menusnap-inbox/<id>/menu.json`
-   If you get `Menu JSON is invalid`, fix the listed fields and submit again.
-5. **Build:** `node bot.js build <id>`
-   This generates the site (preview, ordering off), publishes it, and auto-emails the owner the site link and a private dashboard link. Rebuilding sends a NEW dashboard link and the old one stops working, so only rebuild on purpose.
-6. **Report to Seven:** restaurant name, number of items, the site link, the email status, and anything you skipped or weren't sure about. Never share the dashboard link.
+Hi <Restaurant> team!
 
-Catch-up (missed emails): `node bot.js pending` lists anything still waiting.
+Good news: we turned your menu into an online ordering site, and it's free to try.
+
+See your site: <siteUrl>
+Your private dashboard: <dashboardUrl>
+(Keep the dashboard link private. It logs you in, no password needed.)
+
+Check your menu and prices and make any changes from the dashboard. Online ordering stays off while you preview, so no customer can pay yet.
+
+Like it? Keep it for $99/month plus $1.50 per order. Just reply to this email and we'll turn online ordering on for you.
+
+Thanks,
+Seven at MenuSnap
+
+Not interested? Reply "stop" and we won't email you again.
+<mailing address>
+
+## Notes
+- Sites are previews (ordering off) until Seven turns ordering on.
+- Free Render plan: data resets on redeploy. If a site 404s after a redeploy, the submission is gone; ask Seven.

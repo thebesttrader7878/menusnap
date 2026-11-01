@@ -14,8 +14,7 @@ services:
       # - { key: DATA_DIR, value: /var/data }   # with the disk
       - { key: BASE_URL, value: https://menusnap.onrender.com }
       # - { key: SITES_DOMAIN, value: menusnap.app }   # once *.menusnap.app points here; until then sites live at BASE_URL/r/<slug>
-      - { key: SMTP_USER, value: sevenwilson89@gmail.com }
-      - { key: GMAIL_APP_PASSWORD, sync: false }
+      - { key: RESEND_API_KEY, sync: false }   # emails new submissions to BOT_INBOX_EMAIL; owners are emailed by the bot
       - { key: BOT_API_TOKEN, generateValue: true }
       - { key: BOT_INBOX_EMAIL, value: menusnap@mail.grokbot.com }
       # XAI_API_KEY / OPENAI_API_KEY optional: leave unset so submissions wait for the bot

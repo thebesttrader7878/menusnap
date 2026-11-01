@@ -22,7 +22,7 @@ const call = async (p, opt = {}) => { const r = await fetch(URL_ + p, Object.ass
     console.log(`Saved to ${dir}:\n` + files.concat(path.join(dir, 'info.json')).map(f => '  ' + f).join('\n') + `\nNext: look at the menu photos, write ${path.join(dir, 'menu.json')}, then: node bot.js submit ${id} ${path.join(dir, 'menu.json')}`); return; }
   if (cmd === 'submit') { if (!file) throw new Error('usage: node bot.js submit <id> menu.json'); const menu = JSON.parse(fs.readFileSync(file, 'utf8')); const r = await call(`/api/bot/submissions/${id}/menu`, { method: 'POST', body: JSON.stringify({ menu }) });
     console.log(`Menu accepted: ${r.categories} categories, ${r.items} items. Next: node bot.js build ${id}`); return; }
-  if (cmd === 'build') { const r = await call(`/api/bot/submissions/${id}/build`, { method: 'POST', body: '{}' }); const s = r.submission;
-    console.log(`Status: ${s.status}\nSite: ${s.siteUrl}\nEmail: ${s.emailStatus || 'not sent'}${s.error ? '\nError: ' + s.error : ''}`); return; }
+  if (cmd === 'build') { const r = await call(`/api/bot/submissions/${id}/build`, { method: 'POST', body: JSON.stringify({ force: file === '--force' }) });
+    console.log(JSON.stringify(r, null, 2)); return; }
   throw new Error('unknown command ' + cmd);
 })().catch(e => { console.error('ERROR: ' + e.message); process.exit(1); });

@@ -58,7 +58,7 @@ function decodeImage(dataUrl, max) { const m = /^data:(image\/(png|jpeg|webp));b
 const unsubToken = e => pipeline.unsubToken(e);
 
 // ---------- pipeline (same code the CLI uses) ----------
-const process_ = s => pipeline.run(db, s, { save, onBuilt: r => { const p = procs.get(r.slug); if (p) p.child.kill(); } });
+const process_ = (s, o = {}) => pipeline.run(db, s, { save, onBuilt: r => { const p = procs.get(r.slug); if (p) p.child.kill(); if (o.onToken) o.onToken(r.token); } });
 // ---------- public intake (no login) ----------
 const emailOk = e => /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i.test(e);
 app.post('/api/intake', limit('intake', 5, 36e5), (req, res) => { const b = req.body || {};
@@ -74,7 +74,7 @@ app.post('/api/intake', limit('intake', 5, 36e5), (req, res) => { const b = req.
   notifyBot(s).finally(() => process_(s)); });
 async function notifyBot(s) { const to = env.BOT_INBOX_EMAIL; if (!to) { s.botEmail = 'no BOT_INBOX_EMAIL'; return; }
   const files = s.menuFiles.map((f, i) => ({ filename: `menu-${i + 1}${path.extname(f)}`, content: fs.readFileSync(path.join(DATA, 'uploads', f)) })).concat(s.logoFile ? [{ filename: 'logo' + path.extname(s.logoFile), content: fs.readFileSync(path.join(DATA, 'uploads', s.logoFile)) }] : []);
-  try { const r = await mail.send(mail.botSubmissionEmail({ to, s, files }), path.join(DATA, 'outbox')); s.botEmail = r.via === 'outbox' ? 'queued (no email sender set)' : 'sent via ' + r.via; console.log(`[${s.id}] bot notified at ${to} via ${r.via}${r.eml ? ' (' + r.eml + ')' : ''}`); }
+  try { const r = await mail.send(mail.botSubmissionEmail({ to, s, files, base: pipeline.baseUrl ? pipeline.baseUrl() : (env.BASE_URL || '') }), path.join(DATA, 'outbox')); s.botEmail = r.via === 'outbox' ? 'queued (no email sender set)' : 'sent via ' + r.via; console.log(`[${s.id}] bot notified at ${to} via ${r.via}${r.eml ? ' (' + r.eml + ')' : ''}`); }
   catch (e) { s.botEmail = 'failed: ' + e.message; console.error(`[${s.id}] bot email failed: ${e.message}`); } save(); }
 app.get('/unsubscribe', (req, res) => { const e = String(req.query.e || '').toLowerCase(), t = String(req.query.t || ''); const ok = t.length === 32 && crypto.timingSafeEqual(Buffer.from(t), Buffer.from(unsubToken(e)));
   if (ok && !db.unsubscribed.includes(e)) { db.unsubscribed.push(e); save(); } res.type('html').send(`<!doctype html><meta name=viewport content="width=device-width"><body style="font-family:sans-serif;padding:30px"><h2>${ok ? "You're unsubscribed." : 'That link is not valid.'}</h2><p>${ok ? "We won't email you again." : ''}</p>`); });
@@ -119,7 +119,10 @@ app.post('/api/bot/submissions/:id/menu', bot, (req, res) => { const s = db.subs
   const errs = validMenu(req.body && req.body.menu); if (errs.length) return res.status(400).json({ ok: false, error: 'Menu JSON is invalid', details: errs });
   s.menu = ai.clean(req.body.menu); s.status = 'menu_ready'; s.error = ''; save(); res.json({ ok: true, categories: s.menu.categories.length, items: s.menu.categories.reduce((a, c) => a + c.items.length, 0) }); });
 app.post('/api/bot/submissions/:id/build', bot, async (req, res) => { const s = db.subs.find(s => s.id === req.params.id); if (!s) return res.status(404).json({ ok: false, error: 'Not found' });
-  if (!s.menu) return res.status(400).json({ ok: false, error: 'Submit the menu first' }); await process_(s); res.json({ ok: s.status !== 'needs_review', submission: botView(s) }); });
+  if (!s.menu) return res.status(400).json({ ok: false, error: 'Submit the menu first' });
+  if (s.status === 'live' && !(req.body && req.body.force)) return res.status(409).json({ ok: false, error: 'Already live at ' + s.siteUrl + '. Pass force to rebuild (this makes a NEW dashboard link; the old one stops working).', siteUrl: s.siteUrl });
+  let token = ''; await process_(s, { onToken: t => { token = t; } });
+  const live = s.status === 'live'; res.json({ ok: live, id: s.id, status: s.status, siteUrl: s.siteUrl, dashboardUrl: live && token ? s.siteUrl + '/owner#key=' + token : null, owner: { name: s.name, email: s.email, phone: s.phone }, error: s.error || undefined }); });
 
 app.use('/static', express.static(path.join(__dirname, 'public')));
 const page = f => (req, res) => res.sendFile(path.join(__dirname, 'public', f));
