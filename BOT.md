@@ -46,7 +46,7 @@ Here's what to do:
 
 This link logs you in, so keep it private.
 
-3. Want changes or like it? Reply to this email with any edits you want, or to keep it. It's $99/month plus $1.50 per order.
+3. Want changes or like it? Reply to this email with any edits you want, or to keep it. Plans: Starter $50/month plus $1.99 per order, or Pro $99/month plus $1.50 per order.
 
 4. Book a quick call with Seven to talk through changes: https://calendly.com/seven-wilson1/consulting-call
 
