@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // MenuSnap bot CLI. Reads .env.bot (gitignored) or env: MENUSNAP_URL (default http://localhost:3000), BOT_API_TOKEN.
-//   node bot.js pending | fetch <id> | submit <id> menu.json | build <id>
+//   node bot.js outbox | mark-sent <id> | pending | fetch <id> | submit <id> menu.json | build <id>
 const fs = require('fs'), path = require('path');
 try { for (const l of require('fs').readFileSync(require('path').join(__dirname, '.env.bot'), 'utf8').split('\n')) { const m = /^([A-Z_]+)=(.*)$/.exec(l.trim()); if (m && !process.env[m[1]]) process.env[m[1]] = m[2]; } } catch {}
 const URL_ = (process.env.MENUSNAP_URL || 'http://localhost:3000').replace(/\/$/, ''), TOKEN = process.env.BOT_API_TOKEN || '';
@@ -12,6 +12,8 @@ const call = async (p, opt = {}) => { const r = await fetch(URL_ + p, Object.ass
 (async () => {
   if (!TOKEN) throw new Error('Set BOT_API_TOKEN');
   if (cmd === 'pending') { const { pending } = await call('/api/bot/pending'); if (!pending.length) return console.log('No pending submissions.'); for (const s of pending) console.log(`${s.id}  ${s.status}  ${s.photos} photo(s)  ${s.name}  (${s.created})`); return; }
+  if (cmd === 'outbox') { const { outbox } = await call('/api/bot/outbox'); console.log(JSON.stringify(outbox, null, 1)); return; }
+  if (cmd === 'mark-sent') { if (!id) throw new Error('usage: node bot.js mark-sent <id>'); await call(`/api/bot/outbox/${encodeURIComponent(id)}/sent`, { method: 'POST', body: '{}' }); console.log('Marked sent: ' + id); return; }
   if (!id) throw new Error('usage: node bot.js pending | fetch <id> | submit <id> menu.json | build <id>');
   if (cmd === 'fetch') { const { submission: s } = await call('/api/bot/submissions/' + id); const dir = path.join(INBOX, id); fs.mkdirSync(dir, { recursive: true });
     const files = []; for (const [i, ph] of s.photos.entries()) { const f = path.join(dir, `menu-${i + 1}${path.extname(ph.file)}`); fs.writeFileSync(f, await call(ph.url, { raw: true })); files.push(f); }
