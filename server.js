@@ -75,7 +75,7 @@ app.post('/api/intake', limit('intake', 5, 36e5), (req, res) => { const b = req.
   notifyBot(s).finally(() => process_(s)); });
 app.post('/api/contact', limit('contact', 5, 36e5), async (req, res) => { const b = req.body || {};
   if (b.website) return res.json({ ok: true }); // honeypot
-  const c = { created: new Date().toISOString(), name: str(b.name, 80), restaurant: str(b.restaurant, 120), email: str(b.email, 200).toLowerCase(), phone: str(b.phone, 30), message: String(b.message || '').trim().slice(0, 4000) };
+  const c = { created: new Date().toISOString(), topic: str(b.topic, 60), name: str(b.name, 80), restaurant: str(b.restaurant, 120), email: str(b.email, 200).toLowerCase(), phone: str(b.phone, 30), message: String(b.message || '').trim().slice(0, 4000) };
   if (!c.name) return res.status(400).json({ ok: false, error: 'Add your name.' });
   if (!emailOk(c.email)) return res.status(400).json({ ok: false, error: 'Add a valid email so we can reply.' });
   if (c.message.length < 5) return res.status(400).json({ ok: false, error: 'Add a short message.' });
