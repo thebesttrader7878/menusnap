@@ -1,8 +1,13 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Get your free ordering site | MenuSnap</title><link rel="stylesheet" href="/static/base.css"><link rel="stylesheet" href="/static/start.css"></head><body>
 <header class="top"><a href="/" class="logo">📸 MenuSnap</a></header>
-<main class="wrap" id="formview"><h1>Get your free ordering site</h1><p class="muted">Snap your menu, add your logo, and we'll email you a ready-to-go site. Free to try.</p>
+<main class="wrap" id="formview"><h1>Get your free ordering site</h1><p class="muted">Snap your menu or paste your DoorDash, Uber Eats, Grubhub or website link. We build your demo site and email it to you. Free.</p>
 <form id="f" novalidate>
-<div class="card"><h2>📸 Menu photos</h2><label class="drop" data-testid="menu-drop"><input type="file" id="menu" accept="image/*" multiple capture="environment"><span id="menulbl">Tap to take or choose photos (up to 6)</span></label><div class="thumbs" id="thumbs"></div></div>
+<div class="card"><h2>🔗 Already online?</h2><p class="muted">Paste any link with your menu and we'll pull your items, prices and food photos from it. Optional if you add menu photos.</p>
+<label>DoorDash link<input name="l_doordash" type="url" inputmode="url" placeholder="https://www.doordash.com/store/..." data-testid="in-doordash"></label>
+<label>Uber Eats link<input name="l_ubereats" type="url" inputmode="url" placeholder="https://www.ubereats.com/store/..." data-testid="in-ubereats"></label>
+<label>Grubhub link<input name="l_grubhub" type="url" inputmode="url" placeholder="https://www.grubhub.com/restaurant/..." data-testid="in-grubhub"></label>
+<label>Your website<input name="l_website" type="url" inputmode="url" placeholder="https://yourrestaurant.com" data-testid="in-site"></label></div>
+<div class="card"><h2>📸 Menu photos <span class="muted" style="font-weight:400;font-size:.8em">(or skip if you added a link)</span></h2><label class="drop" data-testid="menu-drop"><input type="file" id="menu" accept="image/*" multiple capture="environment"><span id="menulbl">Tap to take or choose photos (up to 6)</span></label><div class="thumbs" id="thumbs"></div></div>
 <div class="card"><h2>🎨 Logo</h2><label class="drop"><input type="file" id="logo" accept="image/png,image/jpeg,image/webp"><span id="logolbl">Tap to add your logo (optional)</span></label>
 <div class="row hide" id="colors"><img id="logoprev" alt=""><div><p class="muted">Brand colors we picked from your logo:</p><div class="row"><input type="color" id="c1" data-testid="color1"><input type="color" id="c2"></div></div></div></div>
 <div class="card"><h2>🏪 Your restaurant</h2>

@@ -20,8 +20,13 @@ const call = async (p, opt = {}) => { const r = await fetch(URL_ + p, Object.ass
     if (s.logo) { const f = path.join(dir, 'logo' + path.extname(s.logo.file)); fs.writeFileSync(f, await call(s.logo.url, { raw: true })); files.push(f); }
     const { photos, logo, ...info } = s; fs.writeFileSync(path.join(dir, 'info.json'), JSON.stringify(info, null, 1));
     console.log(`Saved to ${dir}:\n` + files.concat(path.join(dir, 'info.json')).map(f => '  ' + f).join('\n') + `\nNext: look at the menu photos, write ${path.join(dir, 'menu.json')}, then: node bot.js submit ${id} ${path.join(dir, 'menu.json')}`); return; }
-  if (cmd === 'submit') { if (!file) throw new Error('usage: node bot.js submit <id> menu.json'); const menu = JSON.parse(fs.readFileSync(file, 'utf8')); const r = await call(`/api/bot/submissions/${id}/menu`, { method: 'POST', body: JSON.stringify({ menu }) });
-    console.log(`Menu accepted: ${r.categories} categories, ${r.items} items. Next: node bot.js build ${id}`); return; }
+  if (cmd === 'submit') { if (!file) throw new Error('usage: node bot.js submit <id> menu.json'); const menu = JSON.parse(fs.readFileSync(file, 'utf8')); const MT = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
+    for (const c of menu.categories || []) for (const it of c.items || []) { const v = it.image || it.imageUrl || it.imageFile; delete it.imageUrl; delete it.imageFile; if (!v || /^(data|upload):/.test(v)) continue;
+      try { let buf, type; if (/^https?:\/\//.test(v)) { const r = await fetch(v); if (!r.ok) throw new Error('HTTP ' + r.status); type = (r.headers.get('content-type') || '').split(';')[0]; buf = Buffer.from(await r.arrayBuffer()); }
+        else { const p = path.resolve(path.dirname(file), v); buf = fs.readFileSync(p); type = MT[path.extname(p).toLowerCase()]; }
+        if (!/^image\/(jpeg|png|webp)$/.test(type)) throw new Error('not a JPG/PNG/WEBP (' + type + ')'); if (buf.length > 3e6) throw new Error('over 3 MB');
+        it.image = `data:${type};base64,` + buf.toString('base64'); } catch (e) { console.warn(`skip photo for "${it.name}": ${e.message}`); delete it.image; } } const r = await call(`/api/bot/submissions/${id}/menu`, { method: 'POST', body: JSON.stringify({ menu }) });
+    console.log(`Menu accepted: ${r.categories} categories, ${r.items} items, ${r.photos || 0} item photos. Next: node bot.js build ${id}`); return; }
   if (cmd === 'build') { const r = await call(`/api/bot/submissions/${id}/build`, { method: 'POST', body: JSON.stringify({ force: file === '--force' }) });
     console.log(JSON.stringify(r, null, 2)); return; }
   throw new Error('unknown command ' + cmd);

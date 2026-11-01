@@ -14,7 +14,9 @@
     $('#menulbl').textContent = st.menus.length + ' photo' + (st.menus.length === 1 ? '' : 's') + ' added. Tap to add more.'; });
   $('#logo').addEventListener('change', async e => { const f = e.target.files[0]; if (!f) return; const im = await load(f); st.logo = toData(im, 600, 'image/png'); $('#logoprev').src = st.logo; const [a, b] = palette(im); $('#c1').value = a; $('#c2').value = b; $('#colors').classList.remove('hide'); $('#logolbl').textContent = 'Logo added. Tap to change.'; });
   $('#f').addEventListener('submit', async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); $('#err').textContent = '';
-    if (!st.menus.length) return $('#err').textContent = 'Add at least one photo of your menu.';
+    const links = {}, bad = []; for (const k of ['doordash', 'ubereats', 'grubhub', 'website']) { let v = (d['l_' + k] || '').trim(); delete d['l_' + k]; if (!v) continue; if (!/^https?:\/\//i.test(v)) v = 'https://' + v; try { const u = new URL(v); if (!u.hostname.includes('.')) throw 0; links[k] = u.href; } catch { bad.push(k); } }
+    if (bad.length) return $('#err').textContent = 'Check this link: ' + bad.map(k => ({ doordash: 'DoorDash', ubereats: 'Uber Eats', grubhub: 'Grubhub', website: 'website' })[k]).join(', ') + '.';
+    if (!st.menus.length && !Object.keys(links).length) return $('#err').textContent = 'Add a menu photo or at least one link.'; d.links = links;
     if (!d.name || !/^\S+@\S+\.\S+$/.test(d.email)) return $('#err').textContent = 'Add your restaurant name and email.';
     const b = $('#go'); b.disabled = true; b.textContent = 'Uploading…';
     try { const r = await fetch('/api/intake', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign(d, { menuImages: st.menus, logo: st.logo || undefined, colors: st.logo ? { primary: $('#c1').value, accent: $('#c2').value } : undefined })) });

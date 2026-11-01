@@ -17,6 +17,18 @@ The platform (https://menusnap-lj8z.onrender.com) never emails restaurant owners
 6. **Email the owner** from menusnap@mail.grokbot.com to `owner.email` using the template below (numbered steps, bold step headers in HTML).
 7. **Report to Seven:** restaurant, siteUrl, owner email, sent yes/no. Never include the dashboardUrl or token in the report.
 
+## Links and food photos
+Owners may send menu photos, links, or both. `info.json` has `links` with any of `doordash`, `ubereats`, `grubhub`, `website`.
+1. Open every link given (WebFetch first; if blocked or empty, use your browser). Pull categories, item names, prices, descriptions and the food photos for each item.
+2. Combine with uploaded menu photos. If they disagree on price, prefer the uploaded photo (newer, restaurant's own) and note it.
+3. Download the food photos you use into the submission folder, then set them on items in menu.json with one of:
+   - `"imageFile": "photos/pho-tai.jpg"` (path relative to menu.json)
+   - `"imageUrl": "https://..."` (bot.js downloads it)
+   - `"image": "data:image/jpeg;base64,..."`
+   JPG, PNG or WEBP, max 3MB each, max 60. `bot.js submit` prints how many photos were accepted. Items with photos show up in the Popular strip.
+4. Only use the restaurant's OWN listing content for its own demo. Never pull photos or items from a different restaurant, stock sites or competitors. No AI-generated food photos.
+5. If a link is dead or blocks you and there are no photos, reply to the owner asking for a menu photo instead of guessing.
+
 ## Owner email template
 Subject: Your free online ordering site is ready, <Restaurant>
 

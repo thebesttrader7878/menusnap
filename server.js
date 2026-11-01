@@ -63,9 +63,10 @@ const process_ = (s, o = {}) => pipeline.run(db, s, { save, onBuilt: r => { cons
 const emailOk = e => /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i.test(e);
 app.post('/api/intake', limit('intake', 5, 36e5), (req, res) => { const b = req.body || {};
   if (b.website) return res.json({ ok: true }); // honeypot: bots fill hidden fields
-  const s = { id: rid(8), created: new Date().toISOString(), name: str(b.name, 80), email: str(b.email, 200).toLowerCase(), phone: str(b.phone, 30), address: str(b.address, 200), hoursText: str(b.hours, 300), colors: { primary: hex(b.colors && b.colors.primary), accent: hex(b.colors && b.colors.accent) }, menuFiles: [] };
+  const s = { id: rid(8), created: new Date().toISOString(), name: str(b.name, 80), email: str(b.email, 200).toLowerCase(), phone: str(b.phone, 30), address: str(b.address, 200), hoursText: str(b.hours, 300), colors: { primary: hex(b.colors && b.colors.primary), accent: hex(b.colors && b.colors.accent) }, menuFiles: [], links: {} };
+  for (const k of ['doordash', 'ubereats', 'grubhub', 'website']) { const v = str((b.links || {})[k], 500); if (!v) continue; let u; try { u = new URL(/^https?:\/\//i.test(v) ? v : 'https://' + v); } catch { u = null; } if (!u || !/^https?:$/.test(u.protocol) || !u.hostname.includes('.')) return res.status(400).json({ ok: false, error: `That ${({ doordash: 'DoorDash', ubereats: 'Uber Eats', grubhub: 'Grubhub', website: 'website' })[k]} link doesn't look like a URL.` }); s.links[k] = u.href; }
   if (!s.name || !emailOk(s.email)) return res.status(400).json({ ok: false, error: 'Add your restaurant name and a valid email.' });
-  const imgs = (Array.isArray(b.menuImages) ? b.menuImages : []).slice(0, 6).map(x => decodeImage(x, 8e6)); if (!imgs.length || imgs.some(x => !x)) return res.status(400).json({ ok: false, error: 'Add 1 to 6 menu photos (JPG, PNG or WEBP, under 8 MB each).' });
+  const imgs = (Array.isArray(b.menuImages) ? b.menuImages : []).slice(0, 6).map(x => decodeImage(x, 8e6)); if (imgs.some(x => !x)) return res.status(400).json({ ok: false, error: 'Menu photos must be JPG, PNG or WEBP, under 8 MB each (up to 6).' }); if (!imgs.length && !Object.keys(s.links).length) return res.status(400).json({ ok: false, error: 'Add menu photos or at least one link (DoorDash, Uber Eats, Grubhub or your website).' });
   let logo = null; if (b.logo) { logo = decodeImage(b.logo, 3e6); if (!logo) return res.status(400).json({ ok: false, error: 'Logo must be a JPG, PNG or WEBP under 3 MB.' }); }
   for (const im of imgs) { const f = s.id + '-menu-' + rid(3) + '.' + im.ext; fs.writeFileSync(path.join(DATA, 'uploads', f), im.buf); s.menuFiles.push(f); }
   if (logo) { s.logoFile = s.id + '-logo.' + logo.ext; fs.writeFileSync(path.join(DATA, 'uploads', s.logoFile), logo.buf); }
@@ -102,7 +103,7 @@ app.post('/api/admin/subs/:id/resend', admin, async (req, res) => { const s = db
 // ---------- bot API (Bearer BOT_API_TOKEN): the MenuSnap bot reads photos itself, no AI key needed ----------
 const BOT = env.BOT_API_TOKEN || '';
 const bot = (req, res, next) => { const h = String(req.get('authorization') || '').replace(/^Bearer /, ''); if (BOT.length < 24 || h.length !== BOT.length || !crypto.timingSafeEqual(Buffer.from(h), Buffer.from(BOT))) return res.status(401).json({ ok: false, error: 'Bad or missing bot token' }); next(); };
-const botView = s => ({ id: s.id, created: s.created, status: s.status, name: s.name, email: s.email, phone: s.phone, address: s.address, hours: s.hoursText, colors: s.colors, slug: s.slug, siteUrl: s.siteUrl, emailStatus: s.emailStatus, error: s.error, menu: s.menu || null,
+const botView = s => ({ id: s.id, created: s.created, status: s.status, links: s.links || {}, name: s.name, email: s.email, phone: s.phone, address: s.address, hours: s.hoursText, colors: s.colors, slug: s.slug, siteUrl: s.siteUrl, emailStatus: s.emailStatus, error: s.error, menu: s.menu || null,
   photos: s.menuFiles.map(f => ({ file: f, url: `/api/bot/files/${f}` })), logo: s.logoFile ? { file: s.logoFile, url: `/api/bot/files/${s.logoFile}` } : null });
 app.get('/api/bot/pending', bot, (req, res) => res.json({ ok: true, pending: db.subs.filter(s => ['pending_bot', 'needs_review'].includes(s.status)).map(s => ({ id: s.id, name: s.name, status: s.status, created: s.created, photos: s.menuFiles.length })) }));
 // Outbox: queued emails (no sender configured). The bot sends them from its own inbox, then marks them sent.
@@ -111,13 +112,19 @@ app.get('/api/bot/outbox', bot, (req, res) => { const list = (fs.existsSync(OUT)
 app.post('/api/bot/outbox/:id/sent', bot, (req, res) => { const id = path.basename(req.params.id), f = path.join(OUT, id + '.json'); if (!fs.existsSync(f)) return res.status(404).json({ ok: false, error: 'Not found' }); fs.renameSync(f, path.join(OUT, id + '.sent')); res.json({ ok: true, id }); });
 app.get('/api/bot/submissions/:id', bot, (req, res) => { const s = db.subs.find(s => s.id === req.params.id); s ? res.json({ ok: true, submission: botView(s) }) : res.status(404).json({ ok: false, error: 'Not found' }); });
 app.get('/api/bot/files/:f', bot, (req, res) => { const f = path.basename(req.params.f); if (!db.subs.some(s => s.menuFiles.includes(f) || s.logoFile === f)) return res.status(404).end(); res.sendFile(path.join(DATA, 'uploads', f)); });
+// Item photos: bot posts item.image as a data: URL; stored in uploads and referenced as upload:<file>.
+function storeItemImages(s, menu) { let n = 0; for (const c of menu.categories) for (const it of c.items) { if (!it.image) { delete it.image; continue; }
+  if (/^upload:[\w.-]+$/.test(it.image) && fs.existsSync(path.join(DATA, 'uploads', it.image.slice(7)))) continue;
+  const im = decodeImage(it.image, 3e6); if (!im) throw new Error(`item "${it.name}": image must be a JPG/PNG/WEBP data URL under 3 MB (bot.js converts URLs/files for you)`);
+  if (++n > 60) throw new Error('max 60 item photos'); const f = s.id + '-item-' + rid(4) + '.' + im.ext; fs.writeFileSync(path.join(DATA, 'uploads', f), im.buf); it.image = 'upload:' + f; } return n; }
 const validMenu = m => { const e = []; if (!m || !Array.isArray(m.categories) || !m.categories.length) e.push('categories must be a non-empty array');
   (m && Array.isArray(m.categories) ? m.categories : []).forEach((c, i) => { if (!c || typeof c.name !== 'string' || !c.name.trim()) e.push(`categories[${i}].name missing`); if (!Array.isArray(c && c.items) || !c.items.length) e.push(`categories[${i}].items must be a non-empty array`);
     ((c && c.items) || []).forEach((it, j) => { if (!it || typeof it.name !== 'string' || !it.name.trim()) e.push(`categories[${i}].items[${j}].name missing`); if (typeof it.price !== 'number' || !(it.price >= 0) || it.price > 1000) e.push(`categories[${i}].items[${j}].price must be a number in dollars (0-1000)`); if (it.description != null && typeof it.description !== 'string') e.push(`categories[${i}].items[${j}].description must be a string`); }); });
   return e.slice(0, 20); };
 app.post('/api/bot/submissions/:id/menu', bot, (req, res) => { const s = db.subs.find(s => s.id === req.params.id); if (!s) return res.status(404).json({ ok: false, error: 'Not found' });
   const errs = validMenu(req.body && req.body.menu); if (errs.length) return res.status(400).json({ ok: false, error: 'Menu JSON is invalid', details: errs });
-  s.menu = ai.clean(req.body.menu); s.status = 'menu_ready'; s.error = ''; save(); res.json({ ok: true, categories: s.menu.categories.length, items: s.menu.categories.reduce((a, c) => a + c.items.length, 0) }); });
+  let photos = 0; try { photos = storeItemImages(s, req.body.menu); } catch (e) { return res.status(400).json({ ok: false, error: 'Menu JSON is invalid', details: [e.message] }); }
+  s.menu = ai.clean(req.body.menu); s.status = 'menu_ready'; s.error = ''; save(); res.json({ ok: true, categories: s.menu.categories.length, items: s.menu.categories.reduce((a, c) => a + c.items.length, 0), photos }); });
 app.post('/api/bot/submissions/:id/build', bot, async (req, res) => { const s = db.subs.find(s => s.id === req.params.id); if (!s) return res.status(404).json({ ok: false, error: 'Not found' });
   if (!s.menu) return res.status(400).json({ ok: false, error: 'Submit the menu first' });
   if (s.status === 'live' && !(req.body && req.body.force)) return res.status(409).json({ ok: false, error: 'Already live at ' + s.siteUrl + '. Pass force to rebuild (this makes a NEW dashboard link; the old one stops working).', siteUrl: s.siteUrl });
