@@ -20,11 +20,11 @@ const str = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
 const hex = v => /^#[0-9a-f]{6}$/i.test(v || '') ? v : null;
 
 // ---------- multi-tenant site host (proxy by subdomain) ----------
-const procs = new Map(); let nextPort = +(env.SITE_PORT_BASE || 4100);
+const demoDash = require('./lib/demo-dashboard'); const procs = new Map(); let nextPort = +(env.SITE_PORT_BASE || 4100);
 function ensureSite(slug) { let p = procs.get(slug); if (p) { p.last = Date.now(); return p.ready; }
-  const dir = path.join(SITES, slug); if (!fs.existsSync(path.join(dir, 'site.json'))) return Promise.reject(new Error('no site'));
+  const isDemo = slug === demoDash.SLUG; const dir = isDemo ? demoDash.prepare() : path.join(SITES, slug); if (!fs.existsSync(path.join(dir, 'site.json'))) return Promise.reject(new Error('no site'));
   const port = nextPort++; const child = spawn(process.execPath, [path.join(__dirname, 'template', 'server.js')], { stdio: ['ignore', 'inherit', 'inherit'],
-    env: Object.assign(Object.fromEntries(Object.entries(env).filter(([k]) => !/^(BOT_API_TOKEN|ADMIN_PASSWORD|ADMIN_PASSWORD_HASH|UNSUB_SECRET|GMAIL_APP_PASSWORD|SMTP_PASS|RESEND_API_KEY|XAI_API_KEY|OPENAI_API_KEY|BOT_INBOX_EMAIL)$/.test(k))), { SESSION_SECRET: crypto.createHash('sha256').update('site|' + slug + '|' + (env.UNSUB_SECRET || 'dev')).digest('hex'), PORT: String(port), SITE_DIR: dir, DATA_FILE: path.join(dir, 'data', 'db.json'), SITE_URL: pipeline.siteUrl(slug), WEBHOOK_OFF: env.WEBHOOK_OFF || '1' }) });
+    env: Object.assign(Object.fromEntries(Object.entries(env).filter(([k]) => !/^(BOT_API_TOKEN|ADMIN_PASSWORD|ADMIN_PASSWORD_HASH|UNSUB_SECRET|GMAIL_APP_PASSWORD|SMTP_PASS|RESEND_API_KEY|XAI_API_KEY|OPENAI_API_KEY|BOT_INBOX_EMAIL)$/.test(k))), { SESSION_SECRET: crypto.createHash('sha256').update('site|' + slug + '|' + (env.UNSUB_SECRET || 'dev')).digest('hex'), PORT: String(port), SITE_DIR: dir, DATA_FILE: path.join(dir, 'data', 'db.json'), SITE_URL: pipeline.siteUrl(slug), WEBHOOK_OFF: env.WEBHOOK_OFF || '1' }, isDemo ? { DEMO_DASHBOARD: '1', ORDERING_LIVE: '1', DATABASE_URL: '', SITE_URL: pipeline.siteUrl(slug) } : {}) });
   p = { port, child, last: Date.now() }; procs.set(slug, p); child.on('exit', () => procs.delete(slug));
   p.ready = new Promise((res, rej) => { let n = 0; const t = setInterval(() => { http.get({ port, path: '/healthz' }, r => { r.resume(); clearInterval(t); res(port); }).on('error', () => { if (++n > 100) { clearInterval(t); rej(new Error('site failed to start')); } }); }, 100); });
   return p.ready; }
@@ -143,6 +143,7 @@ app.post('/api/bot/submissions/:id/build', bot, async (req, res) => { const s = 
 app.use('/static', express.static(path.join(__dirname, 'public')));
 const page = f => (req, res) => res.sendFile(path.join(__dirname, 'public', f));
 app.get('/', page('index.html')); app.get('/start', page('start.html')); app.get('/admin', (req, res, n) => { res.set('X-Robots-Tag', 'noindex'); n(); }, page('admin.html'));
+app.get('/demo-dashboard', (req, res) => res.redirect(302, '/r/' + demoDash.SLUG + '/owner'));
 app.get('/healthz', (req, res) => res.json({ ok: true, ai: ai.provider(), mail: mail.kind(), sites: procs.size }));
 if (require.main === module) app.listen(PORT, () => console.log(`MenuSnap platform :${PORT} ai=${ai.provider()} mail=${mail.kind()} autoSend=${AUTO_SEND}`));
 module.exports = { app, db, procs };

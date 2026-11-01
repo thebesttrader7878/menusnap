@@ -110,7 +110,7 @@
     const rg = rangePicker();
     if (!a) return rg + '<div class="empty">Loading...</div>';
     const hours = a.byHour.map((v, h) => [h, v]).filter(([h, v]) => v || (h >= 9 && h <= 20)).map(([h, v]) => [(h % 12 || 12) + (h < 12 ? 'a' : 'p'), v]);
-    return rg + `<div class="kpis"><div class="kpi"><small>Revenue</small><b data-testid="kpi-revenue">${m(a.revenue)}</b></div><div class="kpi"><small>Orders</small><b data-testid="kpi-orders">${a.orders}</b></div>
+    return rg + `<div class="kpis"><div class="kpi"><small>Revenue</small><b data-testid="kpi-revenue">${m(a.revenue)}</b></div><div class="kpi"><small>Orders</small><b data-testid="kpi-orders">${a.orders}</b></div><div class="kpi good"><small>Saved vs 30% apps</small><b data-testid="kpi-saved">${m(Math.max(0, a.revenue * 0.3 - a.orders * 1.5))}</b><small>30% cut minus $1.50/order</small></div>
       <div class="kpi"><small>Avg order</small><b data-testid="kpi-avg">${m(a.avgOrder)}</b></div><div class="kpi"><small>Refunds</small><b data-testid="kpi-refunds">${m(a.refunds)}</b><small>${a.refundCount} orders</small></div><div class="kpi"><small>Canceled</small><b data-testid="kpi-canceled">${a.canceled}</b></div><div class="kpi"><small>Conversion</small><b data-testid="kpi-conv">${a.conversion}%</b><small>orders ÷ visitors</small></div></div>
       <div class="card"><h3>Top items</h3>${a.topItems.length ? bars(a.topItems.map(i => [i.item, i.sales, `${i.qty} · ${m(i.sales)}`]), 'top-items') : '<p class="fine">No sales yet.</p>'}</div>
       <div class="card"><h3>Orders by hour</h3>${bars(hours, 'by-hour')}</div>

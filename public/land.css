@@ -36,3 +36,9 @@ footer{padding:24px 0;font-size:13px;color:#8b95a7;border-top:1px solid #1f2a3b}
 .cform .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.cmsg{margin:14px 0 0;font-weight:700;min-height:1em}.cmsg.ok{color:#3ddc84}.cmsg.err{color:#ff6b5a}
 @media(min-width:860px){.cform{margin:20px auto 0}.contact h2,.contact .sub{text-align:center}}
 .nav{gap:10px}.nav .btn.sm{white-space:nowrap}@media(max-width:420px){.nav{padding:10px 14px}.nav .logo{font-size:18px}.nav .links{gap:10px}.nav .btn.sm{padding:8px 11px;font-size:13px}}
+.dash{background:#151d2c;border-top:1px solid #1f2a3b;border-bottom:1px solid #1f2a3b;color:#fff;padding:56px 0}.dash h2{color:#fff}.dash .sub,.dash .fine{color:#b9c2d3}
+.dash-grid{display:grid;gap:28px}.dash .pill{display:inline-block;background:linear-gradient(90deg,#ff7a1a,#ff3b1f);color:#fff;font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:10px}
+.ticks{list-style:none;padding:0;margin:18px 0}.ticks li{position:relative;padding-left:30px;margin:12px 0;line-height:1.45}.ticks li:before{content:"✓";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#ff3b1f;color:#fff;font-weight:900;font-size:12px;display:grid;place-items:center}
+.dash-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}.dash-cta .lnk{color:#ffb38a;font-weight:800;text-decoration:underline}
+.dash-devices img.desk{border-color:#2a3446}
+@media(min-width:900px){.dash-grid{grid-template-columns:1fr 1.2fr;align-items:center}}

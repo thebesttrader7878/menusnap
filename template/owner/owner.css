@@ -42,3 +42,6 @@ label{display:block;font-size:.9rem;font-weight:600;margin:0 0 10px}input:not([t
 .sndbar .chip.warn{font-size:.75rem;padding:4px 10px;min-height:0}
 
 .plan{margin:12px;border:2px solid var(--red,#d7263d)}.plan .btn{margin-top:8px}
+.demo-bar{position:sticky;top:0;z-index:50;background:#0f1520;color:#fff;font:600 13px/1.4 system-ui,sans-serif;padding:8px 14px;text-align:center}
+.demo-bar b{background:linear-gradient(90deg,#ff5a1f,#e8202a);padding:2px 8px;border-radius:99px;margin-right:6px;text-transform:uppercase;font-size:11px;letter-spacing:.04em}
+.kpi.good b{color:#0a8a4a}

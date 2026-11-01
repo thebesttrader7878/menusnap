@@ -67,6 +67,10 @@ const app = express();
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(express.json({ limit: '100kb' }));
+// DEMO_DASHBOARD=1: public read-only demo with sample data (MenuSnap landing page). Everyone is 'signed in', every write is refused.
+const DEMO = env.DEMO_DASHBOARD === '1';
+if (DEMO) app.use((req, res, next) => { if (req.method === 'GET' || req.method === 'HEAD' || !/^\/api\//.test(req.path) || req.path === '/api/track' || req.path === '/api/live') return next();
+  res.status(403).json({ ok: false, error: 'This is a demo with sample data, so changes are turned off.' }); });
 app.use((req, res, next) => { res.set('X-Content-Type-Options', 'nosniff'); res.set('Referrer-Policy', 'same-origin'); next(); });
 
 const r2 = n => Math.round(n * 100) / 100;
@@ -240,12 +244,12 @@ app.get('/api/orders/:id', async (req, res) => { res.set('Cache-Control', 'no-st
 
 // ---------- owner auth routes ----------
 const setCookie = (req, res, v, maxAge) => res.set('Set-Cookie', `ctq_owner=${v}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${req.secure || req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : ''}`);
-const getSession = req => { const t = String(cookies(req).ctq_owner || ''); const m = /^(v1\.(\d{13})\.([A-Za-z0-9_-]{22}))\.([A-Za-z0-9_-]{43})$/.exec(t); if (!m || !OWNER_EMAIL) return null;
+const getSession = req => { if (env.DEMO_DASHBOARD === '1') return { email: OWNER_EMAIL, token: 'demo', exp: Date.now() + 864e5 }; const t = String(cookies(req).ctq_owner || ''); const m = /^(v1\.(\d{13})\.([A-Za-z0-9_-]{22}))\.([A-Za-z0-9_-]{43})$/.exec(t); if (!m || !OWNER_EMAIL) return null;
   const a = Buffer.from(sign(m[1])), b = Buffer.from(m[4]); if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
   const exp = +m[2]; if (exp < Date.now() || revoked.has(m[3]) || exp - KEEP_MS < tokenEpoch.at) return null;
   if (!sessions.has(m[3])) sessions.set(m[3], { email: OWNER_EMAIL, exp }); return Object.assign(sessions.get(m[3]), { token: m[3] }); };
 setInterval(() => { const now = Date.now(); for (const [k, v] of sessions) if (v.exp < now) sessions.delete(k); for (const [k, v] of revoked) if (v < now) revoked.delete(k); }, 3600e3).unref();
-const needOwner = (req, res, next) => { res.set('X-Robots-Tag', 'noindex, nofollow'); res.set('Cache-Control', 'no-store'); const s = getSession(req); if (!s) return res.status(401).json({ ok: false, error: 'Log in first' }); req.owner = s; next(); };
+const needOwner = (req, res, next) => { if (DEMO) { req.owner = { email: OWNER_EMAIL, token: 'demo' }; res.set('X-Robots-Tag', 'noindex, nofollow'); return next(); } res.set('X-Robots-Tag', 'noindex, nofollow'); res.set('Cache-Control', 'no-store'); const s = getSession(req); if (!s) return res.status(401).json({ ok: false, error: 'Log in first' }); req.owner = s; next(); };
 
 // CSRF: owner writes must be same-origin JSON (cross-site forms cannot send application/json without a CORS preflight, which we never allow).
 app.use(['/api/admin', '/api/owner'], (req, res, next) => { if (req.method === 'GET' || req.method === 'HEAD') return next();
@@ -416,7 +420,8 @@ app.use('/img', express.static(path.join(SITE_DIR, 'img'), { maxAge: '1d' }));
 app.get('/robots.txt', (req, res) => res.type('text/plain').send('User-agent: *\nDisallow: /owner\nDisallow: /api/\n'));
 const ownerDir = path.join(__dirname, 'owner');
 app.use('/owner', (req, res, next) => { res.set('X-Robots-Tag', 'noindex, nofollow'); res.set('Cache-Control', 'no-store'); next(); });
-app.get(['/owner', '/owner/'], (req, res) => res.sendFile(path.join(ownerDir, 'index.html')));
+app.get(['/owner', '/owner/'], (req, res) => { if (!DEMO) return res.sendFile(path.join(ownerDir, 'index.html'));
+  res.type('html').send(fs.readFileSync(path.join(ownerDir, 'index.html'), 'utf8').replace('<body>', '<body><div class="demo-bar" data-testid="demo-bar"><b>Sample data</b> This is a demo dashboard with made up orders. Buttons are turned off.</div>')); });
 app.use('/owner', express.static(ownerDir));
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 app.get('/healthz', (req, res) => res.json({ ok: true, notify: 'formspree', webhook: WEBHOOK_URL, smtpFallback: smtpReady, store: store.kind, ownerLink: !!(env.OWNER_TOKEN_HASH), site: SITE.slug, stripe: STRIPE_LIVE ? 'live' : 'demo' }));
