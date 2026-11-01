@@ -1,10 +1,10 @@
-# MenuSnap bot runbook
+# EatDirect bot runbook
 
-The platform (https://menusnap-lj8z.onrender.com) never emails restaurant owners. **You (the MenuSnap bot) do**, from your own inbox menusnap@mail.grokbot.com.
+The platform (https://menusnap-lj8z.onrender.com) never emails restaurant owners. **You (the EatDirect bot) do**, from your own inbox menusnap@mail.grokbot.com.
 `bot.js` reads `MENUSNAP_URL` and `BOT_API_TOKEN` from `.env.bot` next to it (never paste the token anywhere).
 
 ## Flow for each submission
-1. **Email arrives** at menusnap@mail.grokbot.com, subject `New MenuSnap submission: <name> [<id>]`, with the menu photo(s) + logo attached (and bot API download links).
+1. **Email arrives** at menusnap@mail.grokbot.com, subject `New EatDirect submission: <name> [<id>]`, with the menu photo(s) + logo attached (and bot API download links).
    No email? Run `node bot.js pending` (lists `pending_bot` / `needs_review`). The platform can only email you once Seven sets `RESEND_API_KEY`.
 2. **Check status first.** `node bot.js fetch <id>` saves photos + `info.json` to `/workspace/menusnap-inbox/<id>/`.
    If `info.json` status is `live`, it is already done: do NOT rebuild (build refuses with 409; `--force` would invalidate the owner's dashboard link).
@@ -53,7 +53,7 @@ This link logs you in, so keep it private.
 Ordering stays off until you say so, so no customers can pay yet.
 
 Thanks,
-Seven at MenuSnap
+Seven at EatDirect
 
 Not interested? Reply "stop" and we won't email you again.
 <mailing address>
@@ -64,7 +64,7 @@ Not interested? Reply "stop" and we won't email you again.
 
 
 ## Contact form emails (customer questions)
-Emails with a subject starting `MenuSnap contact:` come from the contact form on the landing page. They are customer questions, NOT menu submissions.
+Emails with a subject starting `EatDirect contact:` come from the contact form on the landing page. They are customer questions, NOT menu submissions.
 - Don't build anything and don't run `bot.js` for them.
 - Don't auto-reply to the sender.
 - Summarize the question for Seven (name, restaurant, email, phone, what they asked) and draft a reply for him to approve. Reply-To on the email is the sender's address.

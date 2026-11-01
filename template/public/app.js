@@ -1,4 +1,4 @@
-// Restaurant storefront (MenuSnap template, from the restaurant shell). Orders, menu edits and hours live on the server; only the cart and
+// Restaurant storefront (EatDirect template, from the restaurant shell). Orders, menu edits and hours live on the server; only the cart and
 // the customer's own order links live in this browser.
 (function () {
   const $ = s => document.querySelector(s);

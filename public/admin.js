@@ -2,7 +2,7 @@
   const app = document.getElementById('app'); let csrf = '';
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const api = async (p, o = {}) => { const r = await fetch(p, Object.assign({ headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrf } }, o, o.body ? { body: JSON.stringify(o.body) } : {})); const j = await r.json(); if (!r.ok) throw Object.assign(new Error(j.error || r.status), { status: r.status }); return j; };
-  const login = (err) => { app.innerHTML = `<h1>MenuSnap admin</h1><form id="lf" class="card"><label>Password<input type="password" name="password" data-testid="admin-pass"></label><div class="err">${esc(err || '')}</div><button class="btn">Log in</button></form>`;
+  const login = (err) => { app.innerHTML = `<h1>EatDirect admin</h1><form id="lf" class="card"><label>Password<input type="password" name="password" data-testid="admin-pass"></label><div class="err">${esc(err || '')}</div><button class="btn">Log in</button></form>`;
     document.getElementById('lf').onsubmit = async e => { e.preventDefault(); try { csrf = (await api('/api/admin/login', { method: 'POST', body: { password: e.target.password.value } })).csrf; load(); } catch (er) { login(er.message); } }; };
   const load = async () => { try { const me = await api('/api/admin/me'); csrf = me.csrf; const { subs } = await api('/api/admin/subs');
       app.innerHTML = `<h1>Submissions (${subs.length})</h1><p class="muted">AI: <b>${esc(me.ai)}</b> · Email: <b>${esc(me.mail)}</b> · Auto-send: <b>${me.autoSend ? 'on' : 'off'}</b></p>` + subs.map(s => `<div class="card sub" data-testid="sub-${s.id}">
@@ -14,6 +14,6 @@
     } catch (e) { if (e.status === 401) login(); else app.textContent = e.message; } };
   app.addEventListener('click', async e => { const b = e.target.closest('[data-act]'); if (!b) return; b.disabled = true;
     try { if (b.dataset.act === 'save') await api(`/api/admin/subs/${b.dataset.id}/menu`, { method: 'PUT', body: { menu: JSON.parse(app.querySelector(`textarea[data-id="${b.dataset.id}"]`).value) } });
-      if (b.dataset.act === 'resend' && confirm('Rebuild the site? This makes a NEW dashboard link (the old one stops working); the MenuSnap bot must send it to the owner.')) await api(`/api/admin/subs/${b.dataset.id}/resend`, { method: 'POST' }); if (b.dataset.act === 'notify') await api(`/api/admin/subs/${b.dataset.id}/notify-bot`, { method: 'POST' }); load(); } catch (er) { alert(er.message); b.disabled = false; } });
+      if (b.dataset.act === 'resend' && confirm('Rebuild the site? This makes a NEW dashboard link (the old one stops working); the EatDirect bot must send it to the owner.')) await api(`/api/admin/subs/${b.dataset.id}/resend`, { method: 'POST' }); if (b.dataset.act === 'notify') await api(`/api/admin/subs/${b.dataset.id}/notify-bot`, { method: 'POST' }); load(); } catch (er) { alert(er.message); b.disabled = false; } });
   load();
 })();

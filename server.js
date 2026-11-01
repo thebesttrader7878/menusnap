@@ -1,4 +1,4 @@
-// MenuSnap platform: public intake -> AI menu extraction -> generated site (Christy's shell template) -> auto email with site + dashboard magic link.
+// EatDirect platform: public intake -> AI menu extraction -> generated site (Christy's shell template) -> auto email with site + dashboard magic link.
 // Also hosts every generated site (multi-tenant): <slug>.<SITES_DOMAIN> is proxied to a lazily started template process.
 const express = require('express'), bcrypt = require('bcryptjs'), crypto = require('crypto'), fs = require('fs'), path = require('path'), http = require('http'), { spawn } = require('child_process');
 const ai = require('./lib/ai'), mail = require('./lib/mail'), gen = require('./gen/build-site');
@@ -109,7 +109,7 @@ app.put('/api/admin/subs/:id/menu', admin, (req, res) => { const s = db.subs.fin
 // Rebuild + resend: new magic link each time (old one stops working).
 app.post('/api/admin/subs/:id/resend', admin, async (req, res) => { const s = db.subs.find(s => s.id === req.params.id); if (!s) return res.status(404).json({ ok: false }); await process_(s); res.json({ ok: true, status: s.status, emailStatus: s.emailStatus, error: s.error }); });
 
-// ---------- bot API (Bearer BOT_API_TOKEN): the MenuSnap bot reads photos itself, no AI key needed ----------
+// ---------- bot API (Bearer BOT_API_TOKEN): the EatDirect bot reads photos itself, no AI key needed ----------
 const BOT = env.BOT_API_TOKEN || '';
 const bot = (req, res, next) => { const h = String(req.get('authorization') || '').replace(/^Bearer /, ''); if (BOT.length < 24 || h.length !== BOT.length || !crypto.timingSafeEqual(Buffer.from(h), Buffer.from(BOT))) return res.status(401).json({ ok: false, error: 'Bad or missing bot token' }); next(); };
 const botView = s => ({ id: s.id, created: s.created, status: s.status, links: s.links || {}, name: s.name, email: s.email, phone: s.phone, address: s.address, hours: s.hoursText, colors: s.colors, slug: s.slug, siteUrl: s.siteUrl, emailStatus: s.emailStatus, error: s.error, menu: s.menu || null,
@@ -117,7 +117,7 @@ const botView = s => ({ id: s.id, created: s.created, status: s.status, links: s
 app.get('/api/bot/pending', bot, (req, res) => res.json({ ok: true, pending: db.subs.filter(s => ['pending_bot', 'needs_review'].includes(s.status)).map(s => ({ id: s.id, name: s.name, status: s.status, created: s.created, photos: s.menuFiles.length })) }));
 // Outbox: queued emails (no sender configured). The bot sends them from its own inbox, then marks them sent.
 const OUT = path.join(DATA, 'outbox'); const outId = f => path.basename(f, '.json');
-app.get('/api/bot/outbox', bot, (req, res) => { const list = (fs.existsSync(OUT) ? fs.readdirSync(OUT) : []).filter(f => f.endsWith('.json')).sort().map(f => { const m = JSON.parse(fs.readFileSync(path.join(OUT, f), 'utf8')); return { id: outId(f), to: m.to, subject: m.subject, text: m.text, html: m.html, headers: m.headers, attachments: m.attachments, botNotice: /^New MenuSnap submission/.test(m.subject || '') }; }); res.json({ ok: true, outbox: list }); });
+app.get('/api/bot/outbox', bot, (req, res) => { const list = (fs.existsSync(OUT) ? fs.readdirSync(OUT) : []).filter(f => f.endsWith('.json')).sort().map(f => { const m = JSON.parse(fs.readFileSync(path.join(OUT, f), 'utf8')); return { id: outId(f), to: m.to, subject: m.subject, text: m.text, html: m.html, headers: m.headers, attachments: m.attachments, botNotice: /^New EatDirect submission/.test(m.subject || '') }; }); res.json({ ok: true, outbox: list }); });
 app.post('/api/bot/outbox/:id/sent', bot, (req, res) => { const id = path.basename(req.params.id), f = path.join(OUT, id + '.json'); if (!fs.existsSync(f)) return res.status(404).json({ ok: false, error: 'Not found' }); fs.renameSync(f, path.join(OUT, id + '.sent')); res.json({ ok: true, id }); });
 app.get('/api/bot/submissions/:id', bot, (req, res) => { const s = db.subs.find(s => s.id === req.params.id); s ? res.json({ ok: true, submission: botView(s) }) : res.status(404).json({ ok: false, error: 'Not found' }); });
 app.get('/api/bot/files/:f', bot, (req, res) => { const f = path.basename(req.params.f); if (!db.subs.some(s => s.menuFiles.includes(f) || s.logoFile === f)) return res.status(404).end(); res.sendFile(path.join(DATA, 'uploads', f)); });
@@ -145,5 +145,5 @@ const page = f => (req, res) => res.sendFile(path.join(__dirname, 'public', f));
 app.get('/', page('index.html')); app.get('/start', page('start.html')); app.get('/admin', (req, res, n) => { res.set('X-Robots-Tag', 'noindex'); n(); }, page('admin.html'));
 app.get('/demo-dashboard', (req, res) => res.redirect(302, '/r/' + demoDash.SLUG + '/owner'));
 app.get('/healthz', (req, res) => res.json({ ok: true, ai: ai.provider(), mail: mail.kind(), sites: procs.size }));
-if (require.main === module) app.listen(PORT, () => console.log(`MenuSnap platform :${PORT} ai=${ai.provider()} mail=${mail.kind()} autoSend=${AUTO_SEND}`));
+if (require.main === module) app.listen(PORT, () => console.log(`EatDirect platform :${PORT} ai=${ai.provider()} mail=${mail.kind()} autoSend=${AUTO_SEND}`));
 module.exports = { app, db, procs };

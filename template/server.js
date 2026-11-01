@@ -1,4 +1,4 @@
-// Restaurant ordering site (MenuSnap template, built from the restaurant shell). Everything restaurant-specific comes from SITE_DIR/site.json.
+// Restaurant ordering site (EatDirect template, built from the restaurant shell). Everything restaurant-specific comes from SITE_DIR/site.json.
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -67,7 +67,7 @@ const app = express();
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(express.json({ limit: '100kb' }));
-// DEMO_DASHBOARD=1: public read-only demo with sample data (MenuSnap landing page). Everyone is 'signed in', every write is refused.
+// DEMO_DASHBOARD=1: public read-only demo with sample data (EatDirect landing page). Everyone is 'signed in', every write is refused.
 const DEMO = env.DEMO_DASHBOARD === '1';
 if (DEMO) app.use((req, res, next) => { if (req.method === 'GET' || req.method === 'HEAD' || !/^\/api\//.test(req.path) || req.path === '/api/track' || req.path === '/api/live') return next();
   res.status(403).json({ ok: false, error: 'This is a demo with sample data, so changes are turned off.' }); });
@@ -108,7 +108,7 @@ function buildEmail(o, to = pickTo()) {
   const lines = (o.items || []).map(i => `${i.qty} x ${clean(i.name)}${i.mods && i.mods.length ? ' (' + i.mods.map(x => clean(x)).join(', ') + ')' : ''}${i.note ? ' Note: ' + clean(i.note) : ''}  ${money(i.lineTotal)}`);
   const c = o.customer || {};
   const text = [NAME, `NEW ORDER #${clean(o.id)}`, `PICKUP ${o.when === 'asap' || !o.when ? 'ASAP' : 'at ' + clean(o.when)}`, '', `Customer: ${clean(c.name)}`, `Phone: ${clean(c.phone)}`, `Email: ${clean(c.email)}`, '', ...lines, '', `Subtotal: ${money(o.subtotal)}`, `Tax: ${money(o.tax)}`, o.tip ? `Tip: ${money(o.tip)}` : '', `TOTAL: ${money(o.total)}`, `Payment: ${clean(o.payment && o.payment.label)}`, o.notes ? `Order notes: ${clean(o.notes)}` : ''].filter(x => x !== '').join('\n');
-  return { to, from: SMTP_USER || 'orders@menusnap.local', subject: `${NAME}: new ${o.mode || 'pickup'} order #${clean(o.id)} - ${money(o.total)}`, text };
+  return { to, from: SMTP_USER || 'orders@eatdirect.local', subject: `${NAME}: new ${o.mode || 'pickup'} order #${clean(o.id)} - ${money(o.total)}`, text };
 }
 function webhookFields(o) {
   const c = o.customer || {};

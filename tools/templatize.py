@@ -16,7 +16,7 @@ def patch(f, pairs):
 
 # ---------- storefront ----------
 patch('public/app.js', [
-  (f'// {N} storefront.', '// Restaurant storefront (MenuSnap template, from the restaurant shell).'),
+  (f'// {N} storefront.', '// Restaurant storefront (EatDirect template, from the restaurant shell).'),
   ("  const DAYS = ['Sun',", "  const SITE = window.SITE || {};\n  const DAYS = ['Sun',"),
   (re.compile(r"    name: \"Kimmie’s-Christy's Tasty Queen\", phone: '\(913\) 300-0130', address: '1405 S 55th St, Kansas City, KS 66106',\n    doordashUrl: '[^']*',"),
    "    name: SITE.name, phone: SITE.phone || '', address: SITE.address || '',\n    doordashUrl: SITE.doordashUrl || '',"),
@@ -75,7 +75,7 @@ assert 'Christy' not in idx; (T / 'public/index.html').write_text(idx)
 o = (T / 'owner/index.html').read_text().replace(f'<title>Owner · {N}</title>', '<title>Owner dashboard</title>').replace('<script src="/owner/owner.js">', '<script src="/site-config.js"></script>\n<link rel="stylesheet" href="/theme.css">\n<script src="/owner/owner.js">')
 (T / 'owner/index.html').write_text(o)
 patch('owner/owner.js', [
-  (f'// Owner dashboard for {N}.', '// Owner dashboard (MenuSnap template). Opened with a secret magic link, no password.'),
+  (f'// Owner dashboard for {N}.', '// Owner dashboard (EatDirect template). Opened with a secret magic link, no password.'),
   (re.compile(r"  const login = \(\) => `<main class=\"login\">.*?</main>`;", re.S),
    "  const login = () => `<main class=\"login\"><img src=\"/img/logo-180.jpg\" alt=\"\" class=\"logo\"><h1>Owner dashboard</h1><p class=\"mut\">${esc((window.SITE || {}).name || '')}</p>\n    <div class=\"card\"><p data-testid=\"login-err\">${esc(S.err || 'Open the private dashboard link we emailed you. Lost it? Ask us for a new one.')}</p></div>\n    <p class=\"fine\">Customers can’t see this page. <a href=\"/\">Back to the store</a></p></main>`;"),
   ('<span class="fine">Kimmie’s-Christy\'s Tasty Queen</span>', '<span class="fine">${esc((window.SITE || {}).name || \'\')}</span>'),
@@ -84,7 +84,7 @@ patch('owner/owner.js', [
 
 # ---------- server ----------
 patch('server.js', [
-  (f'// {N}: storefront, server-side orders, owner dashboard API.', "// Restaurant ordering site (MenuSnap template, built from the restaurant shell). Everything restaurant-specific comes from SITE_DIR/site.json."),
+  (f'// {N}: storefront, server-side orders, owner dashboard API.', "// Restaurant ordering site (EatDirect template, built from the restaurant shell). Everything restaurant-specific comes from SITE_DIR/site.json."),
   ("const env = process.env;", "const env = process.env;\nconst SITE_DIR = path.resolve(env.SITE_DIR || path.join(__dirname, 'site'));\nconst SITE = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'site.json'), 'utf8'));"),
   (f'const NAME = "{N}";', 'const NAME = SITE.name;'),
   ("const SITE_URL = env.SITE_URL || 'https://kimmies-christys-tasty-queen.onrender.com';", "const SITE_URL = (env.SITE_URL || SITE.siteUrl || 'http://localhost:' + PORT).replace(/\\/$/, '');"),
@@ -97,7 +97,7 @@ patch('server.js', [
   ("const menu = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'menu.json'), 'utf8'));", "const menu = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'menu.json'), 'utf8'));\nstore.init().then(async () => { tokenEpoch.at = +(await store.getKV('tokenEpoch', 0)) || 0; }).catch(() => {});"),
   (re.compile(r"const DEF_SETTINGS = \{ taxRate: 9\.125, pickupMins: 15, acceptOrders: true, pos: 'none', doordashUrl: '[^']*', hours: [^\n]*"),
    "const DEF_SETTINGS = { taxRate: SITE.taxRate || 0, pickupMins: SITE.pickupMins || 15, acceptOrders: true, pos: 'none', doordashUrl: SITE.doordashUrl || '', hours: SITE.hours || Array.from({ length: DAYS }, () => ({ open: '10:00', close: '18:00', closed: false })) };"),
-  ("from: SMTP_USER || 'orders@christys-demo.local'", "from: SMTP_USER || 'orders@menusnap.local'"),
+  ("from: SMTP_USER || 'orders@christys-demo.local'", "from: SMTP_USER || 'orders@eatdirect.local'"),
   ("const exp = +m[2]; if (exp < Date.now() || revoked.has(m[3])) return null;", "const exp = +m[2]; if (exp < Date.now() || revoked.has(m[3]) || exp - KEEP_MS < tokenEpoch.at) return null;"),
   (re.compile(r"app\.post\('/api/owner/login', async \(req, res\) => \{.*?\n\}\);\n", re.S),
    """app.post('/api/owner/magic', async (req, res) => {
@@ -167,7 +167,7 @@ patch('owner/owner.js', [
 with open(T / 'owner/owner.css', 'a') as f: f.write('\n.plan{margin:12px;border:2px solid var(--red,#d7263d)}.plan .btn{margin-top:8px}\n')
 for f in ['README.md', 'render.yaml']: (T / f).unlink(missing_ok=True)
 import json
-pj = json.loads((T / 'package.json').read_text()); pj['name'] = 'menusnap-restaurant-site'; pj['description'] = 'MenuSnap restaurant ordering site template'; (T / 'package.json').write_text(json.dumps(pj, indent=2) + '\n')
+pj = json.loads((T / 'package.json').read_text()); pj['name'] = 'menusnap-restaurant-site'; pj['description'] = 'EatDirect restaurant ordering site template'; (T / 'package.json').write_text(json.dumps(pj, indent=2) + '\n')
 (T / 'package-lock.json').write_text((T / 'package-lock.json').read_text().replace('"christys-tasty-queen"', '"menusnap-restaurant-site"'))
 patch('server.js', [("const ownerTokenHash = async () => (await store.getKV('ownerTokenHash', '')) || (env.OWNER_TOKEN_HASH || '').trim().toLowerCase();",
   "const tokenFile = () => { try { return fs.readFileSync(path.join(SITE_DIR, 'owner-token.hash'), 'utf8').trim(); } catch (e) { return ''; } };\nconst ownerTokenHash = async () => (await store.getKV('ownerTokenHash', '')) || tokenFile() || (env.OWNER_TOKEN_HASH || '').trim().toLowerCase();")])

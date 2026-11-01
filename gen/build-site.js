@@ -14,7 +14,7 @@ function toShellMenu(ai, imgMap = {}) { const items = {}, categories = [], used 
     for (const it of c.items || []) { if (!it.name) continue; const id = uid(it.name); ids.push(id);
       items[id] = { id, name: String(it.name).slice(0, 120), description: String(it.description || '').slice(0, 400), price: Math.round((+it.price || 0) * 100) / 100, image: imgMap[it.image] || '', modifiers: [] }; }
     if (ids.length) categories.push({ id: cid, name: String(c.name).slice(0, 80), items: ids }); }
-  return { source: 'MenuSnap menu extraction', popular: Object.values(items).filter(i => i.image).slice(0, 6).map(i => i.id), categories, items }; }
+  return { source: 'EatDirect menu extraction', popular: Object.values(items).filter(i => i.image).slice(0, 6).map(i => i.id), categories, items }; }
 const DAYN = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 function hoursFrom(h) { if (Array.isArray(h) && h.length === 7) return h.map(d => ({ open: /^\d\d:\d\d$/.test(d.open) ? d.open : '11:00', close: /^\d\d:\d\d$/.test(d.close) ? d.close : '21:00', closed: !!d.closed }));
   return DAYN.map(() => ({ open: '11:00', close: '21:00', closed: false })); }
@@ -23,7 +23,7 @@ function build(cfg, outRoot, opts = {}) {
   const site = { slug, name: String(cfg.name).slice(0, 80), shortName: String(cfg.shortName || cfg.name).slice(0, 40), phone: String(cfg.phone || '').slice(0, 30), address: String(cfg.address || '').slice(0, 200),
     area: String(cfg.area || '').slice(0, 40), ownerEmail: String(cfg.email || '').toLowerCase(), siteUrl: cfg.siteUrl || '', taxRate: +cfg.taxRate || 0, pickupMins: +cfg.pickupMins || 15, hours: hoursFrom(cfg.hours), hoursText: String(cfg.hoursText || '').slice(0, 300),
     colors: colorsFrom(cfg.colors), emoji: '🍽️', headline: cfg.headline || ['Made fresh.', 'Ready when you are.', 'Order pickup online.'], subline: cfg.subline || `Order ahead from ${cfg.name} and skip the line.`,
-    searchHint: 'Search the menu...', doordashUrl: '', heroItems: [], ratings: {}, proof: [], catIcons: {}, catNotes: {}, planPrice: cfg.planPrice || '$99/month', poweredBy: cfg.poweredBy || { name: 'MenuSnap', url: 'https://menusnap.onrender.com/?ref=' + slug } };
+    searchHint: 'Search the menu...', doordashUrl: '', heroItems: [], ratings: {}, proof: [], catIcons: {}, catNotes: {}, planPrice: cfg.planPrice || '$99/month', poweredBy: cfg.poweredBy || { name: 'EatDirect', url: 'https://eatdirect.app/?ref=' + slug } };
   fs.writeFileSync(path.join(dir, 'site.json'), JSON.stringify(site, null, 1));
   const imgMap = {}; if (opts.uploadsDir) { fs.mkdirSync(path.join(dir, 'img', 'items'), { recursive: true });
     for (const c of (cfg.menu && cfg.menu.categories) || []) for (const it of c.items || []) { const m = /^upload:([\w.-]+)$/.exec(it.image || ''); if (!m || imgMap[it.image]) continue; const src = path.join(opts.uploadsDir, m[1]); if (fs.existsSync(src)) { fs.copyFileSync(src, path.join(dir, 'img', 'items', m[1])); imgMap[it.image] = 'img/items/' + m[1]; } } }

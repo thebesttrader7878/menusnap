@@ -1,4 +1,4 @@
-// Owner dashboard (MenuSnap template). Opened with a secret magic link, no password. Talks only to /api/owner/* and /api/admin/* (session cookie).
+// Owner dashboard (EatDirect template). Opened with a secret magic link, no password. Talks only to /api/owner/* and /api/admin/* (session cookie).
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
