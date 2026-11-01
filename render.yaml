@@ -1,0 +1,24 @@
+# Platform: intake + admin + every restaurant site at /r/<slug> (or <slug>.SITES_DOMAIN once a wildcard domain is added).
+# Currently on the FREE plan: no disk, so data resets on every redeploy/restart. Upgrade: plan starter + the disk block below.
+services:
+  - type: web
+    name: menusnap
+    runtime: node
+    plan: free           # starter ($7/mo) + disk recommended so data survives redeploys
+    buildCommand: npm install && cd template && npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    # disk: { name: data, mountPath: /var/data, sizeGB: 1 }   # paid plans only
+    envVars:
+      - { key: NODE_ENV, value: production }
+      # - { key: DATA_DIR, value: /var/data }   # with the disk
+      - { key: BASE_URL, value: https://menusnap.onrender.com }
+      # - { key: SITES_DOMAIN, value: menusnap.app }   # once *.menusnap.app points here; until then sites live at BASE_URL/r/<slug>
+      - { key: SMTP_USER, value: sevenwilson89@gmail.com }
+      - { key: GMAIL_APP_PASSWORD, sync: false }
+      - { key: BOT_API_TOKEN, generateValue: true }
+      - { key: BOT_INBOX_EMAIL, value: menusnap@mail.grokbot.com }
+      # XAI_API_KEY / OPENAI_API_KEY optional: leave unset so submissions wait for the bot
+      - { key: ADMIN_PASSWORD, sync: false }
+      - { key: UNSUB_SECRET, generateValue: true }
+      - { key: MAILING_ADDRESS, sync: false }

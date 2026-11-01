@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Get your free ordering site | MenuSnap</title><link rel="stylesheet" href="/static/base.css"><link rel="stylesheet" href="/static/start.css"></head><body>
+<header class="top"><a href="/" class="logo">📸 MenuSnap</a></header>
+<main class="wrap" id="formview"><h1>Get your free ordering site</h1><p class="muted">Snap your menu, add your logo, and we'll email you a ready-to-go site. Free to try.</p>
+<form id="f" novalidate>
+<div class="card"><h2>📸 Menu photos</h2><label class="drop" data-testid="menu-drop"><input type="file" id="menu" accept="image/*" multiple capture="environment"><span id="menulbl">Tap to take or choose photos (up to 6)</span></label><div class="thumbs" id="thumbs"></div></div>
+<div class="card"><h2>🎨 Logo</h2><label class="drop"><input type="file" id="logo" accept="image/png,image/jpeg,image/webp"><span id="logolbl">Tap to add your logo (optional)</span></label>
+<div class="row hide" id="colors"><img id="logoprev" alt=""><div><p class="muted">Brand colors we picked from your logo:</p><div class="row"><input type="color" id="c1" data-testid="color1"><input type="color" id="c2"></div></div></div></div>
+<div class="card"><h2>🏪 Your restaurant</h2>
+<label>Restaurant name<input name="name" required data-testid="in-name"></label>
+<label>Email (we send your link here)<input name="email" type="email" required data-testid="in-email"></label>
+<label>Phone<input name="phone" type="tel" data-testid="in-phone"></label>
+<label>Address<input name="address" data-testid="in-address"></label>
+<label>Hours<input name="hours" placeholder="Mon-Sat 11am-9pm, Sun closed" data-testid="in-hours"></label>
+<input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true"></div>
+<div class="err" id="err"></div>
+<button class="btn big" id="go" data-testid="submit">Build my site</button><p class="muted center">Free to try. If you love it, it's $99/month + $1.50 per order.</p></form></main>
+<main class="wrap hide" id="done" data-testid="done"><div class="card center"><div class="big-emoji">🎉</div><h1>Got it!</h1><p>We're building your site now. Watch your inbox for your link and your private dashboard.</p></div></main>
+<script src="/static/start.js"></script></body></html>

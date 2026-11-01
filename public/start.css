@@ -1,0 +1,4 @@
+.top{padding:14px 18px}.logo{font-weight:800;font-size:20px;text-decoration:none}.wrap{max-width:560px;margin:auto;padding:0 16px 40px}h1{font-size:28px;margin:6px 0}.card h2{font-size:18px;margin:0 0 8px}
+.drop{display:block;border:2px dashed #d62828;border-radius:16px;padding:22px;text-align:center;color:#d62828;font-weight:700;cursor:pointer;margin:0}.drop input{display:none}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.thumbs img{width:72px;height:72px;object-fit:cover;border-radius:10px}#logoprev{width:72px;height:72px;object-fit:contain;border-radius:12px;background:#f2f2f2}
+input[type=color]{width:56px;height:44px;padding:2px}.btn.big{width:100%;font-size:18px;margin-top:6px}.center{text-align:center}.big-emoji{font-size:56px}.hp{position:absolute;left:-9999px}#colors{margin-top:12px}

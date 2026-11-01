@@ -1,0 +1,19 @@
+(function () {
+  const app = document.getElementById('app'); let csrf = '';
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const api = async (p, o = {}) => { const r = await fetch(p, Object.assign({ headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrf } }, o, o.body ? { body: JSON.stringify(o.body) } : {})); const j = await r.json(); if (!r.ok) throw Object.assign(new Error(j.error || r.status), { status: r.status }); return j; };
+  const login = (err) => { app.innerHTML = `<h1>MenuSnap admin</h1><form id="lf" class="card"><label>Password<input type="password" name="password" data-testid="admin-pass"></label><div class="err">${esc(err || '')}</div><button class="btn">Log in</button></form>`;
+    document.getElementById('lf').onsubmit = async e => { e.preventDefault(); try { csrf = (await api('/api/admin/login', { method: 'POST', body: { password: e.target.password.value } })).csrf; if (b.dataset.act === 'notify') await api(`/api/admin/subs/${b.dataset.id}/notify-bot`, { method: 'POST' }); load(); } catch (er) { login(er.message); } }; };
+  const load = async () => { try { const me = await api('/api/admin/me'); csrf = me.csrf; const { subs } = await api('/api/admin/subs');
+      app.innerHTML = `<h1>Submissions (${subs.length})</h1><p class="muted">AI: <b>${esc(me.ai)}</b> · Email: <b>${esc(me.mail)}</b> · Auto-send: <b>${me.autoSend ? 'on' : 'off'}</b></p>` + subs.map(s => `<div class="card sub" data-testid="sub-${s.id}">
+        <div class="row"><h3 class="grow">${esc(s.name)}</h3><span class="pill ${esc(String(s.status).split(' ')[0])}">${esc(s.status)}</span></div>
+        <div class="meta">${esc(s.email)} · ${esc(s.phone)} · ${esc(s.address)} · ${esc(s.hoursText)}<br>ID <code>${esc(s.id)}</code> · ${new Date(s.created).toLocaleString()}${s.siteUrl ? ` · <a href="${esc(s.siteUrl)}" target="_blank">${esc(s.siteUrl)}</a>` : ''}<br>Owner email: ${esc(s.emailStatus || 'not sent')} · Bot email: ${esc(s.botEmail || '-')}${s.unsubscribed ? ' · UNSUBSCRIBED' : ''}${s.error ? `<br><b style="color:#9b1c1c">${esc(s.error)}</b>` : ''}</div>
+        <div>${(s.menuFiles || []).map(f => `<a href="/api/admin/upload/${esc(f)}" target="_blank"><img src="/api/admin/upload/${esc(f)}" alt="menu"></a>`).join('')}${s.logoFile ? `<img src="/api/admin/upload/${esc(s.logoFile)}" alt="logo">` : ''}</div>
+        <details><summary>Menu JSON (${s.menu ? s.menu.categories.reduce((a, c) => a + c.items.length, 0) + ' items' : 'none yet'})</summary><textarea data-id="${esc(s.id)}">${esc(JSON.stringify(s.menu || { categories: [] }, null, 1))}</textarea><button class="btn sm ghost" data-act="save" data-id="${esc(s.id)}">Save menu</button></details>
+        <div class="row" style="margin-top:8px"><button class="btn sm" data-act="resend" data-id="${esc(s.id)}">Rebuild + resend links</button><button class="btn sm ghost" data-act="notify" data-id="${esc(s.id)}">Resend to bot</button><span class="muted">CLI: <code>node build-site.js ${esc(s.id)}</code></span></div></div>`).join('');
+    } catch (e) { if (e.status === 401) login(); else app.textContent = e.message; } };
+  app.addEventListener('click', async e => { const b = e.target.closest('[data-act]'); if (!b) return; b.disabled = true;
+    try { if (b.dataset.act === 'save') await api(`/api/admin/subs/${b.dataset.id}/menu`, { method: 'PUT', body: { menu: JSON.parse(app.querySelector(`textarea[data-id="${b.dataset.id}"]`).value) } });
+      if (b.dataset.act === 'resend' && confirm('Rebuild the site and email a NEW dashboard link? The old link stops working.')) await api(`/api/admin/subs/${b.dataset.id}/resend`, { method: 'POST' }); if (b.dataset.act === 'notify') await api(`/api/admin/subs/${b.dataset.id}/notify-bot`, { method: 'POST' }); load(); } catch (er) { alert(er.message); b.disabled = false; } });
+  load();
+})();
