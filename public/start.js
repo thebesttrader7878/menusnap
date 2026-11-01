@@ -20,6 +20,6 @@
     if (!d.name || !/^\S+@\S+\.\S+$/.test(d.email)) return $('#err').textContent = 'Add your restaurant name and email.';
     const b = $('#go'); b.disabled = true; b.textContent = 'Uploading…';
     try { const r = await fetch('/api/intake', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign(d, { menuImages: st.menus, logo: st.logo || undefined, colors: st.logo ? { primary: $('#c1').value, accent: $('#c2').value } : undefined })) });
-      const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Something went wrong'); $('#formview').classList.add('hide'); $('#done').classList.remove('hide'); scrollTo(0, 0); }
+      const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Something went wrong'); window.gtag&&gtag('event','generate_lead',{form:'demo_request'}); $('#formview').classList.add('hide'); $('#done').classList.remove('hide'); scrollTo(0, 0); }
     catch (er) { $('#err').textContent = er.message; b.disabled = false; b.textContent = 'Build my site'; } });
 })();
