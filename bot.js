@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// MenuSnap bot CLI. Env: MENUSNAP_URL (default http://localhost:3000), BOT_API_TOKEN.
+// MenuSnap bot CLI. Reads .env.bot (gitignored) or env: MENUSNAP_URL (default http://localhost:3000), BOT_API_TOKEN.
 //   node bot.js pending | fetch <id> | submit <id> menu.json | build <id>
 const fs = require('fs'), path = require('path');
+try { for (const l of require('fs').readFileSync(require('path').join(__dirname, '.env.bot'), 'utf8').split('\n')) { const m = /^([A-Z_]+)=(.*)$/.exec(l.trim()); if (m && !process.env[m[1]]) process.env[m[1]] = m[2]; } } catch {}
 const URL_ = (process.env.MENUSNAP_URL || 'http://localhost:3000').replace(/\/$/, ''), TOKEN = process.env.BOT_API_TOKEN || '';
 const INBOX = process.env.MENUSNAP_INBOX || '/workspace/menusnap-inbox';
 const [cmd, id, file] = process.argv.slice(2);
