@@ -1,0 +1,1 @@
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-83Z1HSG48N');document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="/start"]');if(a)gtag('event','demo_click',{link_text:a.textContent.trim()});});
