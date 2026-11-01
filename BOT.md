@@ -61,3 +61,10 @@ Not interested? Reply "stop" and we won't email you again.
 ## Notes
 - Sites are previews (ordering off) until Seven turns ordering on.
 - Free Render plan: data resets on redeploy. If a site 404s after a redeploy, the submission is gone; ask Seven.
+
+
+## Contact form emails (customer questions)
+Emails with a subject starting `MenuSnap contact:` come from the contact form on the landing page. They are customer questions, NOT menu submissions.
+- Don't build anything and don't run `bot.js` for them.
+- Don't auto-reply to the sender.
+- Summarize the question for Seven (name, restaurant, email, phone, what they asked) and draft a reply for him to approve. Reply-To on the email is the sender's address.

@@ -73,6 +73,15 @@ app.post('/api/intake', limit('intake', 5, 36e5), (req, res) => { const b = req.
   let slug = gen.slugify(s.name), n = 1, c = slug; while (db.subs.some(x => x.slug === c)) c = slug + '-' + (++n); s.slug = c;
   db.subs.push(s); save(); res.json({ ok: true, id: s.id });
   notifyBot(s).finally(() => process_(s)); });
+app.post('/api/contact', limit('contact', 5, 36e5), async (req, res) => { const b = req.body || {};
+  if (b.website) return res.json({ ok: true }); // honeypot
+  const c = { created: new Date().toISOString(), name: str(b.name, 80), restaurant: str(b.restaurant, 120), email: str(b.email, 200).toLowerCase(), phone: str(b.phone, 30), message: String(b.message || '').trim().slice(0, 4000) };
+  if (!c.name) return res.status(400).json({ ok: false, error: 'Add your name.' });
+  if (!emailOk(c.email)) return res.status(400).json({ ok: false, error: 'Add a valid email so we can reply.' });
+  if (c.message.length < 5) return res.status(400).json({ ok: false, error: 'Add a short message.' });
+  const to = env.BOT_INBOX_EMAIL; if (!to) { console.error('contact: no BOT_INBOX_EMAIL'); return res.status(503).json({ ok: false, error: 'Contact is down right now. Please try again later.' }); }
+  try { const r = await mail.send(mail.contactEmail({ to, c }), path.join(DATA, 'outbox-contact')); console.log(`contact from ${c.email} via ${r.via}`); res.json({ ok: true }); }
+  catch (e) { console.error('contact email failed: ' + e.message); res.status(502).json({ ok: false, error: "Couldn't send right now. Please try again in a minute." }); } });
 async function notifyBot(s) { const to = env.BOT_INBOX_EMAIL; if (!to) { s.botEmail = 'no BOT_INBOX_EMAIL'; return; }
   const files = s.menuFiles.map((f, i) => ({ filename: `menu-${i + 1}${path.extname(f)}`, content: fs.readFileSync(path.join(DATA, 'uploads', f)) })).concat(s.logoFile ? [{ filename: 'logo' + path.extname(s.logoFile), content: fs.readFileSync(path.join(DATA, 'uploads', s.logoFile)) }] : []);
   try { const r = await mail.send(mail.botSubmissionEmail({ to, s, files, base: pipeline.baseUrl ? pipeline.baseUrl() : (env.BASE_URL || '') }), path.join(DATA, 'outbox')); s.botEmail = r.via === 'outbox' ? 'queued (no email sender set)' : 'sent via ' + r.via; console.log(`[${s.id}] bot notified at ${to} via ${r.via}${r.eml ? ' (' + r.eml + ')' : ''}`); }

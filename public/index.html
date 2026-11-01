@@ -2,7 +2,7 @@
 <title>MenuSnap: your own online ordering site. Flat price, no 30% cut.</title>
 <meta name="description" content="Send us your menu. Get a free demo online ordering site in 24 hours. $99/mo + $1.50 per order instead of 15 to 30% commission.">
 <link rel="icon" type="image/png" href="/static/img/favicon.png"><link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png"><meta name="theme-color" content="#0f1520"><meta property="og:title" content="MenuSnap: your own online ordering site. No 30% cut."><meta property="og:description" content="Free demo online ordering site in 24 hours. Then $99/mo + $1.50 per order."><meta property="og:image" content="https://menusnap-lj8z.onrender.com/static/img/og.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="/static/land.css"></head><body>
-<header class="nav"><a class="logo" href="/"><img src="/static/img/logo-icon.png" alt="" width="22" height="32"><span>Menu<b>Snap</b></span></a><a class="btn sm" href="/start">Get my free demo</a></header>
+<header class="nav"><a class="logo" href="/"><img src="/static/img/logo-icon.png" alt="" width="22" height="32"><span>Menu<b>Snap</b></span></a><nav class="links"><a href="#contact">Contact</a><a class="btn sm" href="/start">Get my free demo</a></nav></header>
 
 <section class="hero"><div class="wrap hero-grid"><div>
 <p class="kicker">For independent restaurants</p>
@@ -81,6 +81,17 @@
 </div></section>
 
 <section class="final"><div class="wrap"><h2>See your own online ordering site by tomorrow.</h2><p>Free. Takes 2 minutes to send your menu.</p><a class="btn big" href="/start">Get my free demo site →</a></div></section>
-<footer><div class="wrap">© MenuSnap · <a href="/start">Get started</a> · Fee data from each company's public pricing pages, checked 2026.</div></footer>
+<section id="contact" class="contact"><div class="wrap"><h2>Questions? Talk to us.</h2><p class="sub">Not sure if MenuSnap fits your restaurant? Want a custom design? Send us a note and we'll get back to you by email.</p>
+<form id="cf" class="cform" novalidate>
+<label>Your name<input name="name" autocomplete="name" required maxlength="80"></label>
+<label>Restaurant name<input name="restaurant" autocomplete="organization" maxlength="120"></label>
+<label>Email<input name="email" type="email" inputmode="email" autocomplete="email" required maxlength="200"></label>
+<label>Phone <span class="opt">(optional)</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30"></label>
+<label>Message<textarea name="message" rows="4" required maxlength="4000" placeholder="How can we help?"></textarea></label>
+<label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+<button class="btn big" type="submit">Send message</button>
+<p id="cmsg" class="cmsg" role="status" aria-live="polite"></p>
+</form></div></section>
+<footer><div class="wrap">© MenuSnap · <a href="/start">Get started</a> · <a href="#contact">Contact</a> · Fee data from each company's public pricing pages, checked 2026.</div></footer>
 <div class="sticky"><a class="btn" href="/start">Get my free demo →</a></div>
 <script src="/static/land.js"></script></body></html>
