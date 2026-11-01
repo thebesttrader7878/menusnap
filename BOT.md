@@ -14,7 +14,7 @@ The platform (https://menusnap-lj8z.onrender.com) never emails restaurant owners
 5. **Build + publish live:** `node bot.js build <id>` prints JSON:
    `{ "ok": true, "status": "live", "siteUrl": ".../r/<slug>", "dashboardUrl": ".../r/<slug>/owner#key=...", "owner": { "name", "email", "phone" } }`
    The dashboardUrl is a private login link: send it only to the owner's email. Each build makes a new one.
-6. **Email the owner** from menusnap@mail.grokbot.com to `owner.email` using the template below.
+6. **Email the owner** from menusnap@mail.grokbot.com to `owner.email` using the template below (numbered steps, bold step headers in HTML).
 7. **Report to Seven:** restaurant, siteUrl, owner email, sent yes/no. Never include the dashboardUrl or token in the report.
 
 ## Owner email template
@@ -22,15 +22,21 @@ Subject: Your free online ordering site is ready, <Restaurant>
 
 Hi <Restaurant> team!
 
-Good news: we turned your menu into an online ordering site, and it's free to try.
+We turned your menu into an online ordering site. It's free to try.
 
-See your site: <siteUrl>
-Your private dashboard: <dashboardUrl>
-(Keep the dashboard link private. It logs you in, no password needed.)
+Heads up: this is just a demo, not your final website. We can customize it however you want (colors, photos, layout, menu changes, and more).
 
-Check your menu and prices and make any changes from the dashboard. Online ordering stays off while you preview, so no customer can pay yet.
+Here's what to do:
 
-Like it? Keep it for $99/month plus $1.50 per order. Just reply to this email and we'll turn online ordering on for you.
+1. Look at your site: <siteUrl>
+
+2. Fix anything in your dashboard (menu, prices, hours): <dashboardUrl>
+
+This link logs you in, so keep it private.
+
+3. Want changes or like it? Reply to this email with any edits you want, or to keep it. It's $99/month plus $1.50 per order.
+
+Ordering stays off until you say so, so no customers can pay yet.
 
 Thanks,
 Seven at MenuSnap
