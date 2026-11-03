@@ -49,7 +49,7 @@ app.use((req, res, next) => { const slug = tenantOf(req.headers.host); if (slug 
   if (!m[2]) return res.redirect(301, '/r/' + m[1] + '/' + (req.originalUrl.split('?')[1] ? '?' + req.originalUrl.split('?')[1] : ''));
   proxyTo(req, res, m[1], req.originalUrl.slice(('/r/' + m[1]).length), '/r/' + m[1]); });
 
-app.use((req, res, next) => { res.set({ 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Referrer-Policy': 'same-origin', 'Content-Security-Policy': "default-src 'self'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none'" }); next(); });
+app.use((req, res, next) => { res.set({ 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Referrer-Policy': 'same-origin', 'Content-Security-Policy': "default-src 'self'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'" }); next(); });
 app.use(express.json({ limit: '30mb' }));
 const buckets = new Map(); const limit = (name, max, ms) => (req, res, next) => { const k = name + req.ip, now = Date.now(); let b = buckets.get(k); if (!b || b.reset < now) buckets.set(k, b = { n: 0, reset: now + ms }); if (++b.n > max) return res.status(429).json({ ok: false, error: 'Too many tries. Please wait a bit.' }); next(); };
 
@@ -140,6 +140,8 @@ app.post('/api/bot/submissions/:id/build', bot, async (req, res) => { const s = 
   let token = ''; await process_(s, { onToken: t => { token = t; } });
   const live = s.status === 'live'; res.json({ ok: live, id: s.id, status: s.status, siteUrl: s.siteUrl, dashboardUrl: live && token ? s.siteUrl + '/owner#key=' + token : null, owner: { name: s.name, email: s.email, phone: s.phone }, error: s.error || undefined }); });
 
+app.get('/sw.js', (req, res) => { res.set({ 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'no-cache', 'Service-Worker-Allowed': '/' }); res.sendFile(path.join(__dirname, 'public', 'sw.js')); });
+app.get('/offline.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'offline.html')));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 const page = f => (req, res) => res.sendFile(path.join(__dirname, 'public', f));
 app.get('/', page('index.html')); app.get('/start', page('start.html')); app.get('/admin', (req, res, n) => { res.set('X-Robots-Tag', 'noindex'); n(); }, page('admin.html'));
