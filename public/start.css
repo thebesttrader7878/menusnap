@@ -8,3 +8,4 @@ body{background:#0f1520;color:#e8ecf3}.top{border-bottom:1px solid #1f2a3b}.logo
 .btn{background:linear-gradient(135deg,#ff7a1a,#ff3b1f);box-shadow:0 8px 24px rgba(255,74,31,.3)}.btn.ghost{background:#161e2c;color:#e8ecf3;border-color:#33415a}.drop{border-color:#ff5a1f;color:#ff8a3d}#logoprev{background:#0f1520}a{color:#ff8a3d}.top a.logo{color:#fff}
 
 .top{display:flex;justify-content:space-between;align-items:center}.top .toplink{color:#e8ecf3;font-weight:700;text-decoration:none}
+.or{text-align:center;margin:8px 0;opacity:.7}.s2h{margin:18px 0 4px}#next{width:100%;margin-top:6px}

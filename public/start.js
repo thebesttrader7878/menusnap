@@ -23,3 +23,13 @@
       const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Something went wrong'); window.gtag&&gtag('event','generate_lead',{form:'demo_request'}); $('#formview').classList.add('hide'); $('#done').classList.remove('hide'); scrollTo(0, 0); }
     catch (er) { $('#err').textContent = er.message; b.disabled = false; b.textContent = 'Build my site'; } });
 })();
+// two-step form: step 1 = link or menu photo + email, step 2 = the rest (same form, same fields)
+(function () {
+  const $ = s => document.querySelector(s), s2 = $('#step2');
+  function next() { $('#err1').textContent = ''; const dd = $('[name=l_doordash]').value.trim(), photos = $('#thumbs').children.length, em = $('[name=email]').value.trim();
+    if (!dd && !photos) return $('#err1').textContent = 'Paste a delivery-app link or add a menu photo.';
+    if (!/^\S+@\S+\.\S+$/.test(em)) return $('#err1').textContent = 'Add your email so we can send your demo.';
+    s2.classList.remove('hide'); $('#next').classList.add('hide'); window.gtag && gtag('event', 'form_step', { step: 2 }); $('[name=name]').focus(); }
+  $('#next').addEventListener('click', next);
+  $('#f').addEventListener('keydown', e => { if (e.key === 'Enter' && s2.classList.contains('hide') && e.target.tagName === 'INPUT') { e.preventDefault(); next(); } });
+})();

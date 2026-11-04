@@ -2,22 +2,25 @@
 <header class="top"><a href="/" class="logo"><img src="/static/img/logo-icon.png" alt="" width="30" height="30"><span>Eat<b>Direct</b></span></a><a class="toplink" href="/#contact">Contact</a></header>
 <main class="wrap" id="formview"><h1>Get your free online ordering site</h1><p class="muted">Snap your menu or paste your DoorDash, Uber Eats, Grubhub or website link. We build your demo site and email it to you. Free.</p>
 <form id="f" novalidate>
-<div class="card"><h2>🔗 Already online?</h2><p class="muted">Paste any link with your menu and we'll pull your items, prices and food photos from it. Optional if you add menu photos.</p>
+<div class="card" id="step1"><h2>Step 1: Your menu</h2><p class="muted">Paste a delivery-app link <b>or</b> snap a photo of your menu.</p>
 <label>DoorDash link<input name="l_doordash" type="url" inputmode="url" placeholder="https://www.doordash.com/store/..." data-testid="in-doordash"></label>
-<label>Uber Eats link<input name="l_ubereats" type="url" inputmode="url" placeholder="https://www.ubereats.com/store/..." data-testid="in-ubereats"></label>
-<label>Grubhub link<input name="l_grubhub" type="url" inputmode="url" placeholder="https://www.grubhub.com/restaurant/..." data-testid="in-grubhub"></label>
-<label>Your website<input name="l_website" type="url" inputmode="url" placeholder="https://yourrestaurant.com" data-testid="in-site"></label></div>
-<div class="card"><h2>📸 Upload a picture of your physical menu <span class="muted" style="font-weight:400;font-size:.8em">(or skip if you added a link)</span></h2><label class="drop" data-testid="menu-drop"><input type="file" id="menu" accept="image/*" multiple capture="environment"><span id="menulbl">Snap a photo of your paper menu or upload pictures (up to 6)</span></label><div class="thumbs" id="thumbs"></div></div>
+<p class="or">or</p><label class="drop" data-testid="menu-drop"><input type="file" id="menu" accept="image/*" multiple capture="environment"><span id="menulbl">Snap a photo of your paper menu or upload pictures (up to 6)</span></label><div class="thumbs" id="thumbs"></div>
+<label>Email (we send your link here)<input name="email" type="email" required data-testid="in-email"></label>
+<div class="err" id="err1"></div><button type="button" class="btn big" id="next" data-testid="next">Next →</button></div>
+<div id="step2" class="hide"><h2 class="s2h">Step 2: A few details</h2><p class="muted">Only your restaurant name is needed. The rest is optional.</p>
 <div class="card"><h2>🎨 Logo</h2><label class="drop"><input type="file" id="logo" accept="image/png,image/jpeg,image/webp"><span id="logolbl">Tap to add your logo (optional)</span></label>
 <div class="row hide" id="colors"><img id="logoprev" alt=""><div><p class="muted">Brand colors we picked from your logo:</p><div class="row"><input type="color" id="c1" data-testid="color1"><input type="color" id="c2"></div></div></div></div>
 <div class="card"><h2>🏪 Your restaurant</h2>
 <label>Restaurant name<input name="name" required data-testid="in-name"></label>
-<label>Email (we send your link here)<input name="email" type="email" required data-testid="in-email"></label>
-<label>Phone<input name="phone" type="tel" data-testid="in-phone"></label>
-<label>Address<input name="address" data-testid="in-address"></label>
-<label>Hours<input name="hours" placeholder="Mon-Sat 11am-9pm, Sun closed" data-testid="in-hours"></label>
+<label>Phone <span class="muted">(optional)</span><input name="phone" type="tel" data-testid="in-phone"></label>
+<label>Address <span class="muted">(optional)</span><input name="address" data-testid="in-address"></label>
+<label>Hours <span class="muted">(optional)</span><input name="hours" placeholder="Mon-Sat 11am-9pm, Sun closed" data-testid="in-hours"></label>
 <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true"></div>
+<div class="card"><h2>🔗 More links</h2><p class="muted">Optional.</p>
+<label>Uber Eats link<input name="l_ubereats" type="url" inputmode="url" placeholder="https://www.ubereats.com/store/..." data-testid="in-ubereats"></label>
+<label>Grubhub link<input name="l_grubhub" type="url" inputmode="url" placeholder="https://www.grubhub.com/restaurant/..." data-testid="in-grubhub"></label>
+<label>Your website<input name="l_website" type="url" inputmode="url" placeholder="https://yourrestaurant.com" data-testid="in-site"></label></div>
 <div class="err" id="err"></div>
-<button class="btn big" id="go" data-testid="submit">Build my site</button><p class="muted center">Free to try. If you love it, plans start at $50/month + $1.99 per order (or $99/month + $1.50 per order for busier spots).</p><p class="muted center">Your demo is built from our template. Want a fully custom designed site? Just ask, it's available for an upcharge.</p></form></main>
+<button class="btn big" id="go" data-testid="submit">Build my site</button></div><p class="muted center">Free to try. If you love it, Starter is 30 days free, then $50/month + $1.99 per order (or $99/month + $1.50 per order for busier spots).</p><p class="muted center">Your demo is built from our template. Want a fully custom designed site? Just ask, it's available for an upcharge.</p></form></main>
 <main class="wrap hide" id="done" data-testid="done"><div class="card center"><div class="big-emoji">🎉</div><h1>Got it!</h1><p>We're building your site now. Watch your inbox for your link and your private dashboard.</p></div></main>
 <script src="/static/start.js"></script></body></html>

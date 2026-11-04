@@ -2,13 +2,14 @@
 <title>EatDirect: your own online ordering site. Flat price, no 30% cut.</title>
 <meta name="description" content="Send us your menu. Get a free demo online ordering site in 24 hours. Plans from $50/mo + $1.99 per order instead of 15 to 30% commission.">
 <link rel="icon" type="image/png" href="/static/img/favicon.png?v=2"><link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png?v=3"><meta name="theme-color" content="#fff8f0"><meta property="og:title" content="EatDirect: your own online ordering site. No 30% cut."><meta property="og:description" content="Free demo online ordering site in 24 hours. Then plans from $50/mo. No % cut."><meta property="og:image" content="https://eatdirect.app/static/img/og.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="https://eatdirect.app/"><meta property="og:url" content="https://eatdirect.app/"><meta property="og:site_name" content="EatDirect"><link rel="stylesheet" href="/static/land.css"><script async src="https://www.googletagmanager.com/gtag/js?id=G-83Z1HSG48N"></script><script src="/static/ga.js"></script><link rel="manifest" href="/static/manifest.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="EatDirect"><meta name="apple-mobile-web-app-status-bar-style" content="default"><script src="/static/pwa.js" defer></script></head><body>
-<header class="nav"><a class="logo" href="/"><img src="/static/img/logo-icon.png" alt="" width="30" height="30"><span>Eat<b>Direct</b></span></a><nav class="links"><a class="hide-sm" href="#custom">Custom sites</a><a href="#contact">Contact</a><a class="btn sm" href="/start">Get my free demo</a></nav></header>
+<header class="nav"><a class="logo" href="/"><img src="/static/img/logo-icon.png" alt="" width="30" height="30"><span>Eat<b>Direct</b></span></a><nav class="links"><a href="#contact">Contact</a><a class="btn sm" href="/start">Get my free demo</a></nav></header>
 
 <section class="hero"><div class="wrap hero-grid"><div>
 <p class="kicker">For independent restaurants</p>
 <h1>Stop handing apps <span class="hl">30%</span> of every order.</h1>
 <p class="lead">Snap your menu (or paste your DoorDash link). We build your own online ordering site, free to preview, in 24 hours. Then it's a flat monthly price plus a small per order fee, starting at <b>$50/mo</b>. No % cut. That's it.</p><p class="muted" style="font-size:.9em">Demos are built from our online ordering template. Want a fully custom design? Available for an upcharge.</p>
 <a class="btn big" href="/start">Get my free demo site →</a>
+<div class="reel-slot" id="reelHero" hidden></div>
 <ul class="ticks"><li>Free demo in 24h</li><li>No contracts</li><li>No card to start</li></ul>
 </div>
 <div class="car" id="car" aria-roledescription="carousel" aria-label="Photos and sample sites">
@@ -41,15 +42,15 @@
 <label>Average ticket <output id="tOut">$30</output><input id="ticket" type="range" min="10" max="100" step="1" value="30"></label>
 <label>App commission rate<select id="rate"><option value="15">15% (basic)</option><option value="25">25% (plus)</option><option value="30" selected>30% (premium)</option></select></label>
 <div class="res res3"><div><small>App commission</small><strong id="app">$3,600</strong></div><div class="tier" id="tS"><small>Starter</small><strong id="msS">$846</strong><em class="best">Cheapest for you</em></div><div class="tier" id="tP"><small>Pro</small><strong id="msP">$699</strong><em class="best">Cheapest for you</em></div><div class="save"><small id="keepLbl">You keep on Pro</small><strong id="save">$2,901/mo</strong><small id="yr">$34,812 a year</small></div></div>
-<p class="fine">Both sides also pay card processing. With EatDirect that's Stripe's standard rate (about 2.9% + 30¢), paid to Stripe, not us. Not included above.</p>
-<a class="btn" href="/start">Start keeping it →</a>
+<p class="fine">Both sides also pay card processing. With EatDirect that's Stripe's standard rate (about 2.9% + 30¢), paid to Stripe, not us. Not included above. Starter starts with 30 days free; the numbers above are after that.</p>
+<div class="calc-cta"><a class="btn big" href="/start">Get my free demo →</a></div>
 </div></div></section>
 
 <section class="pricing" id="pricing"><div class="wrap">
 <h2>Simple pricing. No % cut.</h2>
 <p class="sub">Free demo first. Pick a plan only if you love it. Switch anytime.</p>
 <div class="plans">
-<div class="plan"><h3>Starter</h3><p class="pfor">For smaller restaurants</p><p class="pp"><b>$50</b>/mo</p><p class="pf">+ $1.99 per order</p><ul><li>Your own online ordering site</li><li>Owner dashboard</li><li>No percentage of your sales</li></ul><p class="fine">Cheaper if you do under about 100 online orders a month.</p><a class="btn" href="/start">Start free</a></div>
+<div class="plan"><h3>Starter</h3><p class="pfor">For smaller restaurants</p><span class="tag free">30 days free</span><p class="pp"><b>$50</b>/mo</p><p class="pf">+ $1.99 per order</p><p class="pfree">30 days free, then $50/mo + $1.99 per order</p><ul><li>Your own online ordering site</li><li>Owner dashboard</li><li>No percentage of your sales</li></ul><p class="fine">Cheaper if you do under about 100 online orders a month.</p><a class="btn" href="/start">Start 30 days free</a></div>
 <div class="plan pro"><span class="tag">Busier spots</span><h3>Pro</h3><p class="pfor">For busier restaurants</p><p class="pp"><b>$99</b>/mo</p><p class="pf">+ $1.50 per order</p><ul><li>Everything in Starter</li><li>Lower per order fee</li><li>No percentage of your sales</li></ul><p class="fine">Cheaper once you pass about 100 online orders a month.</p><a class="btn" href="/start">Start free</a></div>
 </div>
 <p class="fine center">Card processing is Stripe's standard rate, paid to Stripe, not us.</p>
@@ -63,6 +64,9 @@
 <li><b>3</b><h3>Go live</h3><p>Like it? Connect payouts and start taking orders. Don't? Walk away. No contract.</p></li>
 </ol>
 <a class="btn" href="/start">Send my menu →</a>
+</div></section>
+<section class="reels" id="reelRow" hidden><div class="wrap"><h2>See it in action</h2><div class="reel-row" id="reelList"></div></div></section>
+<section class="how how2"><div class="wrap">
 <div class="pstrip"><img loading="lazy" src="/static/img/photo-burger.jpg" alt="Burger and fries" width="1600" height="1000"><img loading="lazy" src="/static/img/photo-spread.jpg" alt="Table full of shared dishes" width="1600" height="1000"><img loading="lazy" src="/static/img/photo-pizza2.jpg" alt="Sliced pizza with fresh toppings" width="1600" height="1000"></div>
 </div></section>
 
@@ -107,20 +111,12 @@
 <div>⚡<h3>Done for you</h3><p>We read your menu and set it all up. You don't build anything.</p></div>
 </div></div></section>
 
-<section id="testimonials" class="testi" hidden><div class="wrap"><h2>What owners say</h2><div id="tlist" class="tgrid"></div></div></section>
+<section id="insta" class="testi insta"><div class="wrap"><h2>From our Instagram</h2><div id="instaList" class="reel-row"></div><p><a class="btn" href="https://www.instagram.com/eatdirect_/" target="_blank" rel="noopener">Follow @eatdirect_</a></p></div></section>
 
-<section id="custom" class="custom"><div class="wrap custom-grid"><div>
-<span class="pill">Not a restaurant?</span>
-<h2>We build custom websites too.</h2>
-<p class="sub">Salons, contractors, shops, gyms, cleaners, any local business. Tell us what you need and we'll design a fast, clean site that gets you more calls and bookings.</p>
-</div><div>
-<ul class="ticks"><li>Custom design that fits your brand</li><li>Looks great on phones, where most of your customers are</li><li>Booking, quote request or contact forms built in</li><li>Google friendly so people can find you</li><li>We handle hosting and updates</li></ul>
-<a class="btn big" href="#contact" data-topic="custom">Tell us about your business →</a>
-</div></div></section>
 <section class="faq"><div class="wrap">
 <h2>Questions</h2>
 <details><summary>Is the demo really free?</summary><p>Yes. We build it, you look at it. No card, no contract. You only pay if you go live.</p></details>
-<details><summary>What does it cost after that?</summary><p>Two plans. Starter is $50 a month plus $1.99 per order, good for smaller spots. Pro is $99 a month plus $1.50 per order, cheaper once you do about 100+ online orders a month. Either way, no percentage of your sales. Card processing is Stripe's standard rate, paid to Stripe.</p></details><details><summary>Can I get a custom design?</summary><p>Yes. Your free demo is built fast from our proven online ordering template, with your menu, logo and colors. Want something fully custom designed for your brand? Just ask and we'll build it for an extra fee.</p></details>
+<details><summary>What does it cost after that?</summary><p>Two plans. Starter is 30 days free, then $50 a month plus $1.99 per order, good for smaller spots. Pro is $99 a month plus $1.50 per order, cheaper once you do about 100+ online orders a month. Either way, no percentage of your sales. Card processing is Stripe's standard rate, paid to Stripe.</p></details><details><summary>Can I get a custom design?</summary><p>Yes. Your free demo is built fast from our proven online ordering template, with your menu, logo and colors. Want something fully custom designed for your brand? Just ask and we'll build it for an extra fee.</p></details>
 <details><summary>Do I have to quit DoorDash?</summary><p>Nope. Keep the apps for delivery and new customers. Send your regulars to your own site and keep more on those orders.</p></details>
 <details><summary>Do you do delivery?</summary><p>EatDirect sites are for pickup orders right now.</p></details>
 <details><summary>What do you need from me?</summary><p>A menu photo, or a link to your DoorDash, Uber Eats, Grubhub or website. Your logo helps too. We use your own listing's items, prices and photos to build your demo.</p></details>
@@ -141,6 +137,6 @@
 <button class="btn big" type="submit">Send message</button>
 <p id="cmsg" class="cmsg" role="status" aria-live="polite"></p>
 </form></div></section>
-<footer><div class="wrap">© EatDirect · <a href="/start">Get started</a> · <a href="#contact">Contact</a> · Fee data from each company's public pricing pages, checked 2026.</div></footer>
+<footer><div class="wrap">© EatDirect · <a href="/start">Get started</a> · <a href="#contact">Contact</a> · Not a restaurant? <a href="#contact" data-topic="custom">We build custom websites too</a>. · Fee data from each company's public pricing pages, checked 2026.</div></footer>
 <div class="sticky"><a class="btn" href="/start">Get my free demo →</a></div>
-<script src="/static/land.js"></script></body></html>
+<script src="/static/reels.js"></script><script src="/static/land.js"></script></body></html>
